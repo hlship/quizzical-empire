@@ -1,0 +1,11 @@
+{
+    "name": "quizissippi-app",
+    "description": "iPhone and Android support for the Quizzical Empire",
+    "version": "0.1",
+    "author": "Howard M. Lewis Shp",
+    "email": "hlship@comcast.net"
+    "main": "./app",
+    "directories": { "lib": "./lib" },
+    "dependencies": {
+    }
+}
