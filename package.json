@@ -1,13 +1,14 @@
 {
     "name": "quizissippi-app",
     "description": "iPhone and Android support for the Quizzical Empire",
-    "version": "0.0.1",
     "author": "Howard M. Lewis Ship",
     "email": "hlship@comcast.net",
-    "main": "./app",
-	"directories": { "lib": "./lib" },
+    "version": "0.0.1",
+    "private": true,
     "dependencies": {
-		"express": "2.4.7",
-		"now": "0.7.5"
-    }
+      "coffee-script":"1.2.0",
+      "express": "2.5.8", 
+      "sass": ">= 0.0.1",
+      "jade": ">= 0.0.1"
+  }
 }
