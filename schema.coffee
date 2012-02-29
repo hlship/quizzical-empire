@@ -1,14 +1,14 @@
 # Defines the schema of data
+# Exports three Mongoose Model objects: Question, Round, and Quiz
 
 mongoose = require "mongoose"
 
 Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
 
 Question = new Schema
   title: String
   text: String
-  answer: text
+  answer: String
 
 Round = new Schema
   kind:
@@ -18,12 +18,18 @@ Round = new Schema
 
 Quiz = new Schema
   title: String
+  created:
+    type: Date
+    default: -> new Date()
   location: String
   rounds: [Round]
 
-mongoose.model('Question', Question)
-mongoose.model('Round', Round)
-mongoose.model('Quiz', Quiz)
+module.exports =
+  Question: mongoose.model('Question', Question)
+  Round: mongoose.model('Round', Round)
+  Quiz: mongoose.model('Quiz', Quiz)
+
+
 
 
 
