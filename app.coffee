@@ -1,5 +1,6 @@
 express = require "express"
 routes = require "./routes"
+mongoose = require "mongoose"
 
 app = module.exports = express.createServer()
 
@@ -21,5 +22,11 @@ app.configure "production", ->
 app.get "/", routes.index
 
 app.listen process.env.PORT || 3000
+
+dburl = process.env.MONGOLAB_URI || "mongodb://localhost/quizzical-empire"
+
+console.log "Connecting to #{dburl} ..."
+
+mongoose.connect dburl
 
 console.log "Quizzical Empire: Express server listening on port %d in %s mode", app.address().port, app.settings.env
