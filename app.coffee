@@ -10,17 +10,15 @@ app.configure () ->
   app.use express.methodOverride()
   app.use app.router
   app.use express.static "#{__dirname}/public"
+  express.errorHandler.title = "Quizzical Empire Online"
 
 app.configure "development", () ->
-  app.use express.errorHandler { dumpExceptions: true, showStack:true }
+  app.use express.errorHandler  dumpExceptions: true, showStack:true
 
 app.configure "production", () ->
   app.use express.errorHandler()
 
 app.get "/", routes.index
-
-app.get "/divide/:numerator/:denominator", routes.divide
-
 
 app.listen process.env.PORT || 3000
 
