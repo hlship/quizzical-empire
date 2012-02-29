@@ -3,7 +3,7 @@ routes = require "./routes"
 
 app = module.exports = express.createServer()
 
-app.configure () ->
+app.configure ->
   app.set "views", "#{__dirname}/views"
   app.set "view engine", "jade"
   app.use express.bodyParser()
@@ -12,10 +12,10 @@ app.configure () ->
   app.use express.static "#{__dirname}/public"
   express.errorHandler.title = "Quizzical Empire Online"
 
-app.configure "development", () ->
+app.configure "development", ->
   app.use express.errorHandler  dumpExceptions: true, showStack:true
 
-app.configure "production", () ->
+app.configure "production", ->
   app.use express.errorHandler()
 
 app.get "/", routes.index
