@@ -1,18 +1,18 @@
 div.hero-unit
-	h1 Welcome to Quizzical Empire Online!
-	p You want trivia! We've got trivia!
+  h1 Welcome to Quizzical Empire Online!
+  p You want trivia! We've got trivia!
 
 div.alert.alert-info
-	| This is a work in progress.
+  | This is a work in progress.
 
 if quizzes.length > 0
-	table.table.table-bordered.table-striped
-		tr
-			th Title
-			th.span6 Date Created
-		for q in quizzes
-			tr
-				td= q.title
-				td= q.created
+  table.table.table-bordered.table-striped
+    tr
+      th Title
+      th.span6 Date Created
+    for q in quizzes
+      tr
+        td= q.title
+        td= q.created
 else
-	div.alert.alert-warning No quizzes have yet been created.
+  div.alert.alert-warning No quizzes have yet been created.
