@@ -1,6 +1,7 @@
 !!! 5
 html
     head
+      //- Often use block append head to add more JS/CSS to the page
       block head
         title= title
         != css("/bootstrap/css/bootstrap")
@@ -9,14 +10,18 @@ html
         != js("underscore")
         != js("backbone")
   body
-    div.container-fluid
-      div.row-fluid
-        div.span2
+    .container-fluid
+      .row-fluid
+        .span2
           block sidebar
             p
             // This is the sidebar
-        div.span10
+        .span10
           block content
             p
               em Placeholder layout content.
           div &copy; 2012 HMLS
+    //- Divs containing templates go here, where they are invisible
+    .invisible
+      block templates
+      

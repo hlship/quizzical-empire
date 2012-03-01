@@ -4,12 +4,12 @@ block append head
   != js("index")
 
 block content
-  div.hero-unit
+  .hero-unit
     h1 Welcome to Quizzical Empire Online!
     p You want trivia! We've got trivia!
     i.icon-heart
 
-  div.alert.alert-info This is a work in progress.
+  .alert.alert-info This is a work in progress.
 
   if quizzes.length > 0
     table.table.table-bordered.table-striped
@@ -21,4 +21,7 @@ block content
           td= q.title
           td= q.created
   else
-    div.alert.alert-warning No quizzes have yet been created.
+    .alert.alert-warning No quizzes have yet been created.
+
+block templates
+  p This is not visible.
