@@ -11,6 +11,7 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use app.router
+  app.use require("connect-assets")()
   app.use express.static "#{__dirname}/public"
   express.errorHandler.title = "Quizzical Empire Online"
 
@@ -43,4 +44,5 @@ mongoose.connect dburl, (err) ->
       new Quiz(title: "A Mind Forever Voyaging").save()
       new Quiz(title: "Foundation And Empire").save()
 
-console.log "Quizzical Empire: Express server listening on port %d in %s mode", app.address().port, app.settings.env
+console.log "Quizzical Empire: Express server listening on port %d in %s mode",
+  app.address().port, app.settings.env
