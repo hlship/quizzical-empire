@@ -7,6 +7,9 @@ Schema = mongoose.Schema
 
 Question = new Schema
   title: String
+  kind:
+    type: String
+    enum: [ "text" ]
   text: String
   answer: String
 

@@ -23,6 +23,8 @@ app.configure "production", ->
 
 app.get "/", routes.index
 
+app.get "/api/quizzes", routes.api.quizzes
+
 app.listen process.env.PORT || 3000
 
 dburl = process.env.MONGOLAB_URI || "mongodb://localhost/quizzical-empire"

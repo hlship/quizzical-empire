@@ -9,19 +9,18 @@ block content
     p You want trivia! We've got trivia!
     i.icon-heart
 
-  .alert.alert-info This is a work in progress.
-
-  if quizzes.length > 0
-    table.table.table-bordered.table-striped
-      tr
-        th Title
-        th.span6 Date Created
-      for q in quizzes
-        tr
-          td= q.title
-          td= q.created
-  else
-    .alert.alert-warning No quizzes have yet been created.
+  //- Insertion point for table or alert:
+  #quiz-table-view
 
 block templates
-  p This is not visible.
+  #quiz-table-template
+    .alert
+      strong No Quizzes!
+      |  Feel free to 
+      a.btn.btn-primary.btn-mini(href='#') Add Some
+    table.table.table-bordered.table-striped.table-condensed
+      thead
+        tr
+          th Title
+          th.span4 Created
+      tbody
