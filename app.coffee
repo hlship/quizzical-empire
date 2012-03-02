@@ -1,5 +1,4 @@
 express = require "express"
-routes = require "./routes"
 mongoose = require "mongoose"
 
 app = module.exports = express.createServer()
@@ -21,9 +20,9 @@ app.configure "development", ->
 app.configure "production", ->
   app.use express.errorHandler()
 
-app.get "/", routes.index
+# Let the routes configure the app:
 
-app.get "/api/quizzes", routes.api.quizzes
+require("./routes")(app)
 
 app.listen process.env.PORT || 3000
 

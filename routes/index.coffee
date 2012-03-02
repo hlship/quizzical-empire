@@ -1,7 +1,10 @@
-# Defines request handling functions; see app.coffee for the routing to these functions.
+# Exports a function that is passed the app, configures the app's routes
 
-exports.index = (req, res) ->
-    res.render "index",
-      title: "Quizzical Empire"
+module.exports = (app) ->
 
-exports.api = require "./api"
+  app.get "/",
+    (req, res) ->
+      res.render "index",
+        title: "Quizzical Empire"
+
+  require("./api")(app)
