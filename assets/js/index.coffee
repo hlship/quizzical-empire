@@ -63,8 +63,8 @@ QuizTableView = View.extend
 
 jQuery ($) ->
 
-  //- We get an unwanted flash unless these are hidden before being copied
-  //- out to the DOM by the QuizTableView
+  # We get an unwanted flash unless these are hidden before being copied
+  # out to the DOM by the QuizTableView
   $("#quiz-table-template").find(".alert, table").hide()
 
   new QuizTableView
