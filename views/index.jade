@@ -16,6 +16,19 @@ block content
   //- Insertion point for table or alert:
   #quiz-table-view
 
+  #delete-quiz-modal.modal.fade
+    .modal-header
+      a.close(data-dismiss="modal") x
+      h3 Really delete quiz?
+    .modal-body
+      p
+        | Deletion of quiz
+        strong.x-title PLACEHOLDER
+        |  is immediate, and cannot be undone.
+    .modal-footer
+      button.btn.btn-danger(data-dismiss="modal") Delete Quiz
+      button.btn(data-dismiss="modal") Close
+
 block templates
   #quiz-table-template
     .alert
@@ -47,6 +60,6 @@ block templates
           i.icon-comment
           | NYI
         li.divider
-        li: a(href="#")
+        li: a.x-delete(href="#")
           i.icon-remove
           | Delete
