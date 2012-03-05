@@ -52,8 +52,8 @@ QuizTableView = View.extend
     quizzes.each @addOne
     @render()
 
-  render: =>
-    if @count is 0
+  render: ->
+    if @count == 0
       @$(".alert").show()
       @$("table").hide()
     else
