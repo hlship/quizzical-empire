@@ -1,6 +1,6 @@
 1. Quizissippi-app
 
-Currently deployed as http://high-ocean-4717.herokuapp.com/
+Currently deployed as http://quizzical-empire.herokuapp.com/
 
 Building up quite a stack, quickly!
 
