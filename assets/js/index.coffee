@@ -16,11 +16,13 @@ QuizTableRowView = View.extend
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this
 
-  render: ->
-    title = @model.escape("title")
-    date = @model.get("created")
+    @template = $("#quiz-table-row-template").get(0).innerHTML
 
-    @$el.html "<td>#{title}</td> <td>#{date}</td>"
+  render: ->
+
+    @$el.html Mustache.render @template,
+      title: @model.get("title")
+      created: @model.get("created")
 
     this
 
