@@ -18,6 +18,9 @@ QuizTableRowView = View.extend
 
     @template = $("#quiz-table-row-template").get(0).innerHTML
 
+  events:
+    "click .x-delete": "deleteDialog"
+
   render: ->
 
     @$el.html Mustache.render @template,
@@ -25,6 +28,18 @@ QuizTableRowView = View.extend
       created: @model.get("created")
 
     this
+
+  deleteDialog: ->
+    dialog = $("#delete-quiz-modal")
+    dialog.find(".x-title").html @model.escape("title")
+
+    dialog.find(".btn-danger")
+      .unbind("click")
+      .one "click", =>
+        @model.destroy()
+
+    dialog.modal()
+
 
 QuizTableView = View.extend
 
@@ -49,7 +64,7 @@ QuizTableView = View.extend
     @count = 0
     @$("tbody").empty()
 
-    quizzes.each @addOne
+    quizzes.each (quiz) => @addOne quiz
     @render()
 
   render: ->
