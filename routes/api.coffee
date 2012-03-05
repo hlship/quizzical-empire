@@ -17,3 +17,10 @@ module.exports = (app) ->
         throw err if err
         sendJSON res, docs
 
+  app.delete "/api/quizzes/:id",
+    (req, res) ->
+      console.log "Deleting quiz #{req.params.id}"
+      # very dangerous! Need to add some permissions checking
+      Quiz.remove { _id: req.params.id }, (err) ->
+        throw err if err
+        sendJSON res, { result: "ok" }
