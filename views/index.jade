@@ -19,9 +19,8 @@ block content
 block templates
   #quiz-table-template
     .alert
-      strong No Quizzes!
-      |  Feel free to 
-      a.btn.btn-primary.btn-mini(href='#') Add Some
+      strong No Quizzes!&nbsp;
+      a.btn.btn-primary.btn-mini.x-create-new(href='#') Add Some
     table.table.table-bordered.table-striped.table-condensed
       thead
         tr
@@ -29,6 +28,7 @@ block templates
           th.span4 Created
           th.span3
       tbody
+    button.btn.btn-primary.x-create-new Create New Quiz
   script#quiz-table-row-template(type="text/template")
     td {{title}}
     td {{created}}
@@ -47,6 +47,6 @@ block templates
           i.icon-comment
           | NYI
         li.divider
-        li: a(href="#") 
+        li: a(href="#")
           i.icon-remove
           | Delete
