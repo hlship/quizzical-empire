@@ -1,6 +1,4 @@
-# Just a demonstration; rewrite the existing alert-info into an alert-error
 [Model, Collection, View] = [Backbone.Model, Backbone.Collection, Backbone.View]
-
 
 Quiz = Model.extend
   idAttribute: "_id"
