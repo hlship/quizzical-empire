@@ -6,9 +6,6 @@ html
         title= title
         != css("/bootstrap/css/bootstrap")
         != css("style")
-        != js("jquery-1.7.1")
-        != js("underscore")
-        != js("backbone")
   body
     .container-fluid
       .row-fluid
@@ -24,4 +21,10 @@ html
     //- Divs containing templates go here, where they are invisible
     .invisible
       block templates
-      
+    //- Scripts are loaded last, at the end of the page
+    //- Frustrating that Bootstrap.js and RequireJS seem to be at odds with
+    //- each other.
+    block scripts
+      != js("jquery-1.7.1")
+      != js("underscore")
+      != js("backbone")
