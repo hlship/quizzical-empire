@@ -27,7 +27,26 @@ block templates
         tr
           th Title
           th.span4 Created
+          th.span3
       tbody
   script#quiz-table-row-template(type="text/template")
     td {{title}}
     td {{created}}
+    td.dropdown
+      a.btn.dropdown-toggle(data-toggle="dropdown")
+        | Actions
+        b.caret
+      ul.dropdown-menu
+        li: a(href="#")
+          i.icon-refresh
+          | NYI
+        li: a(href="#")
+          i.icon-tag
+          | NYI
+        li: a(href="#")
+          i.icon-comment
+          | NYI
+        li.divider
+        li: a(href="#") 
+          i.icon-remove
+          | Delete
