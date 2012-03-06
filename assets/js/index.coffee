@@ -47,28 +47,25 @@ QuizTableView = View.extend
 
     @$el.html $("#quiz-table-template").html()
 
-    @count = 0
     Quizzes.bind "reset", @addAll, this
     Quizzes.bind "add", @addOne, this
+    Quizzes.bind "destroy", @render, this
 
     Quizzes.fetch()
 
   addOne: (quiz) ->
-    @count++
-
     view = new QuizTableRowView model:quiz
 
     @$("tbody").append view.render().el
 
   addAll: (quizzes) ->
-    @count = 0
     @$("tbody").empty()
 
     quizzes.each (quiz) => @addOne quiz
     @render()
 
   render: ->
-    if @count == 0
+    if Quizzes.length == 0
       @$(".alert").show()
       @$("table").hide()
     else
