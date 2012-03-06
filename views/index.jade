@@ -15,10 +15,9 @@ block content
 
   //- Insertion point for table or alert:
   #quiz-table-view
-
   #delete-quiz-modal.modal.fade
     .modal-header
-      a.close(data-dismiss="modal") x
+      a.close(data-dismiss="modal") &times;
       h3 Really delete quiz?
     .modal-body
       p
@@ -42,6 +41,11 @@ block templates
           th.span3
       tbody
     button.btn.btn-primary.x-create-new Create New Quiz
+    //- Not happy needing this &nbsp;, but without it, the buttons are squeezed
+    //- together. This doesn't happen in the Bootstrap samples and I'm not sure
+    //- why.
+    &nbsp;
+    button.btn.x-create-test-data Create Test Quizzes
   script#quiz-table-row-template(type="text/template")
     td {{title}}
     td {{created}}

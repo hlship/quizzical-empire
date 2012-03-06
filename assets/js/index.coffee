@@ -53,6 +53,10 @@ QuizTableView = View.extend
 
     Quizzes.fetch()
 
+    @$(".x-create-test-data").popover
+      title: "For Testing"
+      content: "Creates many Quizzes with random text, for testing purposes."
+
   addOne: (quiz) ->
     view = new QuizTableRowView model:quiz
 
