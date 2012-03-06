@@ -8,16 +8,9 @@ html
         != css("style")
   body
     .container-fluid
-      .row-fluid
-        .span2
-          block sidebar
-            p
-            // This is the sidebar
-        .span10
-          block content
-            p
-              em Placeholder layout content.
-          div &copy; 2012 HMLS
+       block content
+       div &copy; 2012 &nbsp;
+         a(href="http://howardlewisship.com/") Howard M. Lewis Ship
     //- Divs containing templates go here, where they are invisible
     .invisible
       block templates
