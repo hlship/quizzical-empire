@@ -35,15 +35,5 @@ mongoose.connect dburl, (err) ->
     console.log "Connection errors: #{err}"
     throw err
 
-  Quiz = require("./schema").Quiz
-
-  Quiz.count {}, (err, n) ->
-    throw err if err
-    console.log "Found #{n} quizzes"
-    if n is 0
-      console.log "Inserting a couple of Quizzes"
-      new Quiz(title: "A Mind Forever Voyaging").save()
-      new Quiz(title: "Foundation And Empire").save()
-
 console.log "Quizzical Empire: Express server listening on port %d in %s mode",
   app.address().port, app.settings.env
