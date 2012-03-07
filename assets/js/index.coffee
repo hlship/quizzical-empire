@@ -7,8 +7,6 @@ QuizList = Collection.extend
   model: Quiz
   url: "/api/quizzes"
 
-Quizzes = new QuizList()
-
 QuizTableRowView = View.extend
   tagName: "tr"
 
@@ -40,22 +38,26 @@ QuizTableRowView = View.extend
 
     dialog.modal()
 
-
+# Owns the table that displays the current list of Quizzes, including
+# the buttons used to create a new quiz, etc.
 QuizTableView = View.extend
 
   initialize: ->
 
+    @quizzes = new QuizList
+
     @$el.html $("#quiz-table-template").html()
 
-    Quizzes.bind "reset", @addAll, this
-    Quizzes.bind "add", @addOne, this
-    Quizzes.bind "destroy", @render, this
+    @quizzes.bind "reset", @addAll, this
+    @quizzes.bind "add", @addOne, this
+    @quizzes.bind "destroy", @render, this
 
-    Quizzes.fetch()
+    @quizzes.fetch()
 
     @$(".x-create-test-data").popover
       title: "For Testing"
-      content: "Creates many Quizzes with random text, for testing purposes."
+      content: """Creates many Quizzes with random text, for testing purposes.
+                This will be removed in the final application."""
 
   addOne: (quiz) ->
     view = new QuizTableRowView model:quiz
@@ -69,13 +71,29 @@ QuizTableView = View.extend
     @render()
 
   render: ->
-    if Quizzes.length == 0
+    if @quizzes.length == 0
       @$(".alert").show()
       @$("table").hide()
     else
       @$(".alert").hide()
       @$("table").show()
     this
+
+  createTestData: ->
+    b = @$(".x-create-test-data")
+    b.button('loading').popover('hide')
+
+    $.ajax "/api/create-test-data",
+      context: this
+      success: (data, status) ->
+        b.button('reset')
+        @quizzes.reset data
+
+
+  events:
+    "click .x-create-test-data": "createTestData"
+
+# Now some page-load-time initialization:
 
 jQuery ($) ->
 

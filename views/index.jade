@@ -45,7 +45,8 @@ block templates
     //- together. This doesn't happen in the Bootstrap samples and I'm not sure
     //- why.
     &nbsp;
-    button.btn.x-create-test-data Create Test Quizzes
+    button.btn.x-create-test-data(data-loading-text="Loading ...").
+      Create Test Quizzes
   script#quiz-table-row-template(type="text/template")
     td {{title}}
     td {{created}}
