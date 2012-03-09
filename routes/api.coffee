@@ -2,6 +2,7 @@
 # its routes
 
 schema = require "../schema"
+Flow = require "../lib/flow"
 Quiz = schema.Quiz
 
 sendJSON = (res, json) ->
@@ -27,16 +28,17 @@ module.exports = (app) ->
 
   app.get "/api/create-test-data",
     (req, res) ->
-      remaining = 100
 
-      keepCount = (err) ->
-        throw err if err
-        remaining--
+      flow = new Flow
+      for i in [1..100]
+        quiz = new Quiz
+          title: "Test Quiz \# #{i}"
+          location: "Undisclosed"
 
-        if (remaining == 0)
-          Quiz.find {}, (err, docs) ->
-            throw err if err
-            sendJSON res, docs
+        quiz.save flow.add (err) ->
+          throw err if err
 
-      for i in [1..remaining]
-        new Quiz(title: "Test Quiz \# #{i}").save keepCount
+      flow.join ->
+        Quiz.find {}, (err, docs) ->
+          throw err if err
+          sendJSON res, docs
