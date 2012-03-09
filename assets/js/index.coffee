@@ -23,6 +23,7 @@ QuizTableRowView = View.extend
 
     @$el.html Mustache.render @template,
       title: @model.get("title")
+      location: @model.get("location")
       created: @model.get("created")
 
     this
