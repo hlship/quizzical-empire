@@ -8,14 +8,19 @@ block content
 
   .tabbable#top-level-tabs
     ul.nav.nav-tabs
+
       li: a(href="#quiz-table-view", data-toggle="tab") Quizzes
-      li: a(href="#foo", data-toggle="tab") TBA1
-      li: a(href="#foo", data-toggle="tab") TBA2
-      li: a(href="#foo", data-toggle="tab") TBA3
+      li: a(href="#tba1", data-toggle="tab") TBA1
+      li: a(href="#tba2", data-toggle="tab") TBA2
+      li: a(href="#tba3", data-toggle="tab") TBA3
     .tab-content
-      .tab-pane#quiz-table-view.fade.in
-      .tab-pane#foo.fade.in
-        strong Not Yet Implemented
+      #quiz-table-view.tab-pane
+      #tba1.tab-pane
+        strong Not Yet Implemented 1
+      #tba2.tab-pane
+        strong Not Yet Implemented 2
+      #tba3.tab-pane
+        strong Not Yet Implemented 3
 
   //- This doesn't work quite right if placed inside the "templates"
   #delete-quiz-modal.modal.fade
