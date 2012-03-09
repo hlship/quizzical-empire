@@ -13,8 +13,8 @@ block content
       li: a(href="#foo", data-toggle="tab") TBA2
       li: a(href="#foo", data-toggle="tab") TBA3
     .tab-content
-      .tab-pane#quiz-table-view
-      .tab-pane#foo
+      .tab-pane#quiz-table-view.fade.in
+      .tab-pane#foo.fade.in
         strong Not Yet Implemented
 
   //- This doesn't work quite right if placed inside the "templates"
@@ -44,13 +44,11 @@ block templates
             th.span4 Created
             th.span3
         tbody
-    button.btn.btn-primary.x-create-new Create New Quiz
-    //- Not happy needing this &nbsp;, but without it, the buttons are squeezed
-    //- together. This doesn't happen in the Bootstrap samples and I'm not sure
-    //- why.
-    &nbsp;
-    button.btn.x-create-test-data(data-loading-text="Loading ...").
-      Create Test Quizzes
+    .well
+      button.btn.btn-primary.x-create-new Create New Quiz
+      &nbsp;
+      button.btn.x-create-test-data(data-loading-text="Loading ...").
+        Create Test Quizzes
   script#quiz-table-row-template(type="text/template")
     td {{title}}
     td {{created}}
