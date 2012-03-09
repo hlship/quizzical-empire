@@ -7,6 +7,12 @@ html
         != css("/bootstrap/css/bootstrap")
         != css("style")
   body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.brand(href="#")
+            img(src="/images/logo-navbar.png")
+            | Quizzical Empire
     .container-fluid
        block content
        div &copy; 2012 &nbsp;
