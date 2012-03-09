@@ -97,6 +97,12 @@ QuizTableView = View.extend
 
 jQuery ($) ->
 
+  # This could be moved to a "layout.coffee" perhaps:
+  $(".invisible").hide().removeClass("invisible")
+
+  # Find the main tab view and select the first tab
+  $("#top-level-tabs a:first").tab "show"
+
   # We get an unwanted flash unless these are hidden before being copied
   # out to the DOM by the QuizTableView
   $("#quiz-table-template").find(".alert, table").hide()

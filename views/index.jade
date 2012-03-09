@@ -5,7 +5,19 @@ block append scripts
 
 block content
   //- Insertion point for table or alert:
-  #quiz-table-view
+
+  .tabbable#top-level-tabs
+    ul.nav.nav-tabs
+      li: a(href="#quiz-table-view", data-toggle="tab") Quizzes
+      li: a(href="#foo", data-toggle="tab") TBA1
+      li: a(href="#foo", data-toggle="tab") TBA2
+      li: a(href="#foo", data-toggle="tab") TBA3
+    .tab-content
+      .tab-pane#quiz-table-view
+      .tab-pane#foo
+        strong Not Yet Implemented
+
+  //- This doesn't work quite right if placed inside the "templates"
   #delete-quiz-modal.modal.fade
     .modal-header
       a.close(data-dismiss="modal") &times;
@@ -24,13 +36,14 @@ block templates
     .alert
       strong.
         No Quizzes have been created yet ... feel free to start creating some!
-    table.table.table-bordered.table-striped.table-condensed
-      thead
-        tr
-          th Title
-          th.span4 Created
-          th.span3
-      tbody
+    .limit-height
+      table.table.table-bordered.table-striped.table-condensed
+        thead
+          tr
+            th Title
+            th.span4 Created
+            th.span3
+        tbody
     button.btn.btn-primary.x-create-new Create New Quiz
     //- Not happy needing this &nbsp;, but without it, the buttons are squeezed
     //- together. This doesn't happen in the Bootstrap samples and I'm not sure
