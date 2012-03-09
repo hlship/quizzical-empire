@@ -46,7 +46,8 @@ block templates
         thead
           tr
             th Title
-            th.span4 Created
+            th.span3 Location
+            th.span3 Created
             th.span3
         tbody
     .well
@@ -56,6 +57,7 @@ block templates
         Create Test Quizzes
   script#quiz-table-row-template(type="text/template")
     td {{title}}
+    td {{location}}
     td {{created}}
     td.dropdown
       a.btn.dropdown-toggle(data-toggle="dropdown")
