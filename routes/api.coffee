@@ -39,6 +39,5 @@ module.exports = (app) ->
           throw err if err
 
       flow.join ->
-        Quiz.find {}, (err, docs) ->
-          throw err if err
-          sendJSON res, docs
+        sendJSON res, { result: "ok" }
+

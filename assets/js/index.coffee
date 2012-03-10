@@ -88,7 +88,7 @@ QuizTableView = View.extend
       context: this
       success: (data, status) ->
         b.button('reset')
-        @quizzes.reset data
+        @quizzes.fetch()
 
 
   events:
