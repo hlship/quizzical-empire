@@ -25,9 +25,10 @@ class Flow extends event.EventEmitter
   # Adds a callaback and returns a function that will invoke the
   # callback. Adding a callback increases the count. The count is
   # decreased after the callback is invoked.  Callbacks are invoked
-  # with this set to null.  Join callbacks are invoked when the count
+  # with 'this' set to null.  Join callbacks are invoked when the count
   # reaches zero. Callbacks should be added before join callbacks are
-  # added.
+  # added. Assumes each callback will be called exactly once, though
+  # this is not checked for.
   add: (callback) ->
 
     # One more callback until we can invoke join callbacks
@@ -40,7 +41,7 @@ class Flow extends event.EventEmitter
 
   # Adds a join callback, which will be invoked after all previously
   # added callbacks have been invoked. Join callbacks are invoked with
-  # this set to null and no arguments. Emits a 'join' event, passing
+  # 'this' set to null and no arguments. Emits a 'join' event, passing
   # this Flow, after invoking any explicitly added join callbacks.
   # Invokes the callback immediately if there are no outstanding
   # callbacks.
