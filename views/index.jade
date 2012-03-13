@@ -69,9 +69,10 @@ block templates
           | Delete
   script#quiz-edit-form(type="text/template")
     form.well(action="#")
-      label.x-name Quiz Name
-      input.span4.x-name(type="text", placeholder="Enter name of quiz")
-      label.x-location Location
+      label Quiz Title
+      input.span4.x-title(type="text")
+      span.help-inline Title or theme for the Quiz
+      label Location
       input.span4.x-location(type="text")
       span.help-inline Location where Quiz will take place
       div.x-rounds
