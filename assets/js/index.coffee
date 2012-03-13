@@ -1,13 +1,26 @@
 [Model, Collection, View] = [Backbone.Model, Backbone.Collection, Backbone.View]
 
+displayFirstTab = ->
+  $("#top-level-tabs a:first").tab "show"
+
 readTemplate = (scriptId) ->
   jQuery("##{scriptId}").get(0).innerHTML
 
 fromMustacheTemplate = (scriptId, attributes) ->
   Mustache.render readTemplate(scriptId), attributes
 
+isBlank = (str) ->
+  _.isNull(str) or
+  _.isUndefined(str) or
+  str.trim() == ""
+
 Quiz = Model.extend
   idAttribute: "_id"
+  urlRoot: "/api/quiz"
+  validate: (attrs) ->
+    return "Quiz title may not be blank" if isBlank attrs.title
+
+    return null
 
 QuizList = Collection.extend
   model: Quiz
@@ -17,8 +30,8 @@ QuizTableRowView = View.extend
   tagName: "tr"
 
   initialize: ->
-    @model.bind "change", @render, this
-    @model.bind "destroy", @remove, this
+    @model.on "change", @render, this
+    @model.on "destroy", @remove, this
 
     @template = readTemplate "quiz-table-row-template"
 
@@ -55,9 +68,9 @@ QuizTableView = View.extend
 
     @$el.html $("#quiz-table-template").html()
 
-    @quizzes.bind "reset", @addAll, this
-    @quizzes.bind "add", @addOne, this
-    @quizzes.bind "destroy", @render, this
+    @quizzes.on "reset", @addAll, this
+    @quizzes.on "add", @addOne, this
+    @quizzes.on "destroy", @render, this
 
     @quizzes.fetch()
 
@@ -98,8 +111,9 @@ QuizTableView = View.extend
 
 
   createNewQuiz: ->
-    model = new Quiz
-    new QuizEditorView(model, @quizzes).render()
+    new QuizEditorView(
+      model: new Quiz,
+      collection: @quizzes).render()
 
   events:
     "click .x-create-test-data": "createTestData"
@@ -109,8 +123,6 @@ QuizTableView = View.extend
 QuizEditorView = View.extend
 
   className: "tab-pane"
-
-  initialize: (@model, @quizzes) ->
 
   # Create the top level tab and select it
   render: ->
@@ -124,10 +136,63 @@ QuizEditorView = View.extend
     @$el.attr("id", tabId).html(
       readTemplate "quiz-edit-form").appendTo("#top-level-tabs > .tab-content")
 
+    @updateButton()
+
+    @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
+
+    @viewTab.tab "show"
+
     $("#top-level-tabs .nav-tabs a:last").tab "show"
+
+    @populateFields()
+
+    @model.on "change:title", @updateTabTitle, this
+    @model.on "change:title", @updateButton, this
+
+        # Move the cursor into the title field
+    @$(".x-title").select()
+
+  updateTabTitle: ->
+    @viewTab.html @quizName()
+
+  updateButton: ->
+    @$(".x-create-quiz").attr "disabled", not @model.isValid()
+
+  populateFields: ->
+    @$(".x-title").val(@model.get("title"))
+    @$(".x-location").val(@model.get("location"))
+
+  removeView: ->
+    # TODO: Leaves event listeners on the model, but the model should only
+    # be accessible to this instance anyway.
+
+    # Display the main tab
+    displayFirstTab()
+
+    # Remove the tab-pane div
+    @$el.remove()
+    # And the LI containing the tab's A
+    @viewTab.parent().remove()
 
   quizName: ->
     @model.escape("title") || "<em>New Quiz</em>"
+
+  # Looks like a bit of boilerplate to keep the model
+  # and the model and the view synchronized here.
+  storeTitle: ->
+    @model.set "title", @$(".x-title").val()
+
+  storeLocation: ->
+    @model.set "location", @$(".x-location").val()
+
+  doCancel: ->
+    # TODO: A modal warning
+    @removeView()
+
+  events:
+    "change .x-title": "storeTitle"
+    "change .x-location": "storeLocation"
+    "click .x-cancel" : "doCancel"
 
 # Now some page-load-time initialization:
 
@@ -136,8 +201,7 @@ jQuery ->
   # This could be moved to a "layout.coffee" perhaps:
   $(".invisible").hide().removeClass("invisible")
 
-  # Find the main tab view and select the first tab
-  $("#top-level-tabs a:first").tab "show"
+  displayFirstTab()
 
   # We get an unwanted flash unless these are hidden before being copied
   # out to the DOM by the QuizTableView
