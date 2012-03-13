@@ -27,7 +27,7 @@ block content
       button.btn(data-dismiss="modal") Close
 
 block templates
-  script#quiz-table-template(type="text/template")
+  #quiz-table-template
     .alert
       strong.
         No Quizzes have been created yet ... feel free to start creating some!
@@ -42,7 +42,6 @@ block templates
         tbody
     .well
       button.btn.btn-primary.x-create-new Create New Quiz
-      &nbsp;
       button.btn.x-create-test-data(data-loading-text="Loading ...").
         Create Test Quizzes
   script#quiz-table-row-template(type="text/template")
