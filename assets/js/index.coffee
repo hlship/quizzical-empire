@@ -1,5 +1,11 @@
 [Model, Collection, View] = [Backbone.Model, Backbone.Collection, Backbone.View]
 
+readTemplate = (scriptId) ->
+  jQuery("##{scriptId}").get(0).innerHTML
+
+fromMustacheTemplate = (scriptId, attributes) ->
+  Mustache.render readTemplate(scriptId), attributes
+
 Quiz = Model.extend
   idAttribute: "_id"
 
@@ -14,7 +20,7 @@ QuizTableRowView = View.extend
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this
 
-    @template = $("#quiz-table-row-template").get(0).innerHTML
+    @template = readTemplate "quiz-table-row-template"
 
   events:
     "click .x-delete": "deleteDialog"
@@ -91,12 +97,41 @@ QuizTableView = View.extend
         @quizzes.fetch()
 
 
+  createNewQuiz: ->
+    model = new Quiz
+    new QuizEditorView(model, @quizzes).render()
+
   events:
     "click .x-create-test-data": "createTestData"
+    "click .x-create-new": "createNewQuiz"
+
+# QuizEditorView creates and manages a top level tab for the Quiz.
+QuizEditorView = View.extend
+
+  className: "tab-pane"
+
+  initialize: (@model, @quizzes) ->
+
+  # Create the top level tab and select it
+  render: ->
+    tabId = _.uniqueId "quiztab_"
+
+    $("#top-level-tabs > ul").append(
+      "<li><a href='##{tabId}' data-toggle='tab'>#{@quizName()}</a></li>")
+
+    # Set the id attribute, read the template containing the form,
+    # and move it into place.
+    @$el.attr("id", tabId).html(
+      readTemplate "quiz-edit-form").appendTo("#top-level-tabs > .tab-content")
+
+    $("#top-level-tabs .nav-tabs a:last").tab "show"
+
+  quizName: ->
+    @model.escape("title") || "<em>New Quiz</em>"
 
 # Now some page-load-time initialization:
 
-jQuery ($) ->
+jQuery ->
 
   # This could be moved to a "layout.coffee" perhaps:
   $(".invisible").hide().removeClass("invisible")
