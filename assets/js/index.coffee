@@ -26,6 +26,32 @@ QuizList = Collection.extend
   model: Quiz
   url: "/api/quizzes"
 
+ConfirmDeleteDialog = View.extend
+
+  initialize: ->
+    @render()
+
+  render: ->
+    @$el.html fromMustacheTemplate "delete-quiz-modal",
+      title: @model.escape "title"
+
+    $("body").append(@$el)
+
+    @$el.addClass "fade in"
+
+    @$el.modal().on "hidden", =>
+      @remove()
+
+   dismissDialog: ->
+    @$el.modal "hide"
+
+   doConfirm: ->
+     @trigger "confirm", @model
+
+   events:
+    "click .x-confirm": "doConfirm"
+    "click .btn": "dismissDialog"
+
 QuizTableRowView = View.extend
   tagName: "tr"
 
@@ -41,22 +67,15 @@ QuizTableRowView = View.extend
   render: ->
 
     @$el.html Mustache.render @template,
-      title: @model.get("title")
-      location: @model.get("location")
-      created: @model.get("created")
+      title: @model.get "title"
+      location: @model.get "location"
+      created: @model.get "created"
 
     this
 
   deleteDialog: ->
-    dialog = $("#delete-quiz-modal")
-    dialog.find(".x-title").html @model.escape("title")
 
-    dialog.find(".btn-danger")
-      .unbind("click")
-      .one "click", =>
-        @model.destroy()
-
-    dialog.modal()
+    new ConfirmDeleteDialog(model: @model).on "confirm", => @model.destroy()
 
 # Owns the table that displays the current list of Quizzes, including
 # the buttons used to create a new quiz, etc.
@@ -140,6 +159,8 @@ QuizEditorView = View.extend
     @$el.attr("id", tabId).html(
       readTemplate "quiz-edit-form").appendTo("#top-level-tabs > .tab-content")
 
+    @$(".x-cancel").tooltip()
+
     @updateSaveButton()
 
     @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
@@ -155,6 +176,9 @@ QuizEditorView = View.extend
 
     # Move the cursor into the title field
     @$(".x-title").select()
+
+  remove: ->
+    @$el.remove()
 
   updateTabTitle: ->
     @viewTab.html @quizName()
@@ -174,10 +198,12 @@ QuizEditorView = View.extend
     # Display the main tab
     displayFirstTab()
 
-    # Remove the tab-pane div
-    @$el.remove()
+    @$(".x-cancel").tooltip "hide"
+
     # And the LI containing the tab's A
     @viewTab.parent().remove()
+
+    @remove()
 
   quizName: ->
     @model.escape("title") || "<em>New Quiz</em>"
@@ -236,14 +262,7 @@ QuizEditorView = View.extend
 
 jQuery ->
 
-  # This could be moved to a "layout.coffee" perhaps:
-  $(".invisible").hide().removeClass("invisible")
-
   displayFirstTab()
-
-  # We get an unwanted flash unless these are hidden before being copied
-  # out to the DOM by the QuizTableView
-  $("#quiz-table-template").find(".alert, table").hide()
 
   new QuizTableView
     el: $("#quiz-table-view")
