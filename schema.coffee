@@ -6,24 +6,34 @@ mongoose = require "mongoose"
 Schema = mongoose.Schema
 
 Question = new Schema
-  title: String
+  title:
+    type: String
+    required: true
   kind:
     type: String
     enum: [ "text" ]
-  text: String
-  answer: String
+  text:
+    type: String
+    required: true
+  answer:
+    type: String
+    required: true
   value: Number
   { strict: true }
 
 Round = new Schema
   kind:
     type: String
+    required: true
     enum: ["normal", "challenge", "wager"]
   questions: [Question]
   { strict: true }
 
 Quiz = new Schema
-  title: String
+  title:
+    type: String
+    required: true
+    unique: true
   created:
     type: Date
     default: -> new Date()
@@ -35,10 +45,3 @@ module.exports =
   Question: mongoose.model('Question', Question)
   Round: mongoose.model('Round', Round)
   Quiz: mongoose.model('Quiz', Quiz)
-
-
-
-
-
-
-
