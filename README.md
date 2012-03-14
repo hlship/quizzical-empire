@@ -1,4 +1,4 @@
-1. Quizissippi-app
+1. Quizzical Empire Online
 
 Currently deployed as http://quizzical.herokuapp.com/
 
