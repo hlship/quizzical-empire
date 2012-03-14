@@ -79,10 +79,14 @@ QuizTableView = View.extend
       content: """Creates many Quizzes with random text, for testing purposes.
                 This will be removed in the final application."""
 
-  addOne: (quiz) ->
+  addOne: (quiz, collection, options) ->
     view = new QuizTableRowView model:quiz
 
-    @$("tbody").append view.render().el
+    # Special case for inserting at index 0, which happens when a new quiz
+    # is added in the UI.
+    fname = if options? and options.index is 0 then "prepend" else "append"
+
+    @$("tbody")[fname] view.render().el
 
   addAll: (quizzes) ->
     @$("tbody").empty()
@@ -136,7 +140,7 @@ QuizEditorView = View.extend
     @$el.attr("id", tabId).html(
       readTemplate "quiz-edit-form").appendTo("#top-level-tabs > .tab-content")
 
-    @updateButton()
+    @updateSaveButton()
 
     @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
 
@@ -147,16 +151,17 @@ QuizEditorView = View.extend
     @populateFields()
 
     @model.on "change:title", @updateTabTitle, this
-    @model.on "change:title", @updateButton, this
+    @model.on "change", @updateSaveButton, this
 
-        # Move the cursor into the title field
+    # Move the cursor into the title field
     @$(".x-title").select()
 
   updateTabTitle: ->
     @viewTab.html @quizName()
 
-  updateButton: ->
-    @$(".x-create-quiz").attr "disabled", not @model.isValid()
+  # Disables the save button unless the model is valid
+  updateSaveButton: ->
+    @$(".x-save").attr "disabled", not @model.isValid()
 
   populateFields: ->
     @$(".x-title").val(@model.get("title"))
@@ -178,7 +183,7 @@ QuizEditorView = View.extend
     @model.escape("title") || "<em>New Quiz</em>"
 
   # Looks like a bit of boilerplate to keep the model
-  # and the model and the view synchronized here.
+  # and the view synchronized here.
   storeTitle: ->
     @model.set "title", @$(".x-title").val()
 
@@ -189,10 +194,43 @@ QuizEditorView = View.extend
     # TODO: A modal warning
     @removeView()
 
+  errorAlert: (message) ->
+    alert = fromMustacheTemplate "standard-error-alert",
+      content: message
+
+    @$(".x-alert-container").append alert
+
+  doSave: ->
+    b = @$(".x-save").button("loading")
+
+    @model.save null,
+      error: (model, response) =>
+        b.button("reset")
+        @errorAlert response.responseText or response.statusText
+
+      success: (model, response) =>
+        b.button("reset")
+        switch response.result
+          when "ok"
+            @removeView()
+            @collection.add new Quiz(response.quiz), at: 0
+          when "fail"
+            @errorAlert response.message
+            # The "error" class name goes on the div.control-group around the
+            # text field.
+            @$(".x-#{response.hint}")
+              .select()
+              .parents(".control-group")
+              .addClass("error")
+          else
+            @errorAlert "Unexpected response from server."
+
+
   events:
     "change .x-title": "storeTitle"
     "change .x-location": "storeLocation"
     "click .x-cancel" : "doCancel"
+    "click .x-save" : "doSave"
 
 # Now some page-load-time initialization:
 

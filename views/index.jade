@@ -68,14 +68,22 @@ block templates
           i.icon-remove
           | Delete
   script#quiz-edit-form(type="text/template")
+    .x-alert-container
     form.well(action="#")
-      label Quiz Title
-      input.span4.x-title(type="text")
-      span.help-inline Title or theme for the Quiz
-      label Location
-      input.span4.x-location(type="text")
-      span.help-inline Location where Quiz will take place
+      .control-group
+        label Quiz Title
+        input.span4.x-title(type="text")
+        span.help-inline Title or theme for the Quiz
+      .control-group
+        label Location
+        input.span4.x-location(type="text")
+        span.help-inline Location where Quiz will take place
       div.x-rounds
-      button.btn.btn-primary.x-create-quiz Save Quiz
+      button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
       &nbsp;
       button.btn.x-cancel Cancel
+   script#standard-error-alert(type="text/template")
+     div.alert.alert-error.fade.in
+       a.close(data-dismiss="alert", href="#") &times;
+       h4.alert-heading Error!
+       | {{content}}
