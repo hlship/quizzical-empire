@@ -2,9 +2,10 @@
 
 module.exports = (app) ->
 
+  # May move this to a different url in the future.
   app.get "/",
     (req, res) ->
-      res.render "index",
+      res.render "author",
         title: "Quizzical Empire"
 
   require("./api")(app)
