@@ -50,13 +50,14 @@ block templates
   script#quiz-edit-form(type="text/template")
     .x-alert-container
     form.well(action="#")
-      .control-group
+      .control-group.x-title
         label Quiz Title
-        input.span4.x-title(type="text")
-        span.help-inline Title or theme for the Quiz
-      .control-group
+        .controls
+          input.span4(type="text")
+          span.help-inline Title or theme for the Quiz
+      .control-group.x-location
         label Location
-        input.span4.x-location(type="text")
+        input.span4(type="text")
         span.help-inline Location where Quiz will take place
       div.x-rounds
       button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz

@@ -17,10 +17,6 @@ isBlank = (str) ->
 Quiz = Model.extend
   idAttribute: "_id"
   urlRoot: "/api/quiz"
-  validate: (attrs) ->
-    return "Quiz title may not be blank" if isBlank attrs.title
-
-    return null
 
 QuizList = Collection.extend
   model: Quiz
@@ -39,6 +35,7 @@ ConfirmDeleteDialog = View.extend
 
     @$el.addClass "fade in"
 
+    # After the modal dialog is hidden, remove it from the DOM
     @$el.modal().on "hidden", =>
       @remove()
 
@@ -63,12 +60,13 @@ QuizTableRowView = View.extend
 
   events:
     "click .x-delete": "deleteDialog"
+    "click .x-edit": "editQuiz"
 
   render: ->
 
     @$el.html Mustache.render @template,
-      title: @model.get "title"
-      location: @model.get "location"
+      title: @model.escape "title" || "<em>No Title</em>"
+      location: @model.escape "location"
       created: @model.get "created"
 
     this
@@ -76,6 +74,12 @@ QuizTableRowView = View.extend
   deleteDialog: ->
 
     new ConfirmDeleteDialog(model: @model).on "confirm", => @model.destroy()
+
+  editQuiz: ->
+
+    new QuizEditorView
+      model: @model
+      collection: @collection
 
 # Owns the table that displays the current list of Quizzes, including
 # the buttons used to create a new quiz, etc.
@@ -86,6 +90,10 @@ QuizTableView = View.extend
     @quizzes = new QuizList
 
     @$el.html $("#quiz-table-template").html()
+
+    # Hide the alert and the table initially, while the content is
+    # being fetched via Ajax
+    @$(".alert, table").hide()
 
     @quizzes.on "reset", @addAll, this
     @quizzes.on "add", @addOne, this
@@ -99,7 +107,9 @@ QuizTableView = View.extend
                 This will be removed in the final application."""
 
   addOne: (quiz, collection, options) ->
-    view = new QuizTableRowView model:quiz
+    view = new QuizTableRowView
+      model:quiz
+      collection: @quizzes
 
     # Special case for inserting at index 0, which happens when a new quiz
     # is added in the UI.
@@ -134,21 +144,28 @@ QuizTableView = View.extend
 
 
   createNewQuiz: ->
-    new QuizEditorView(
+    new QuizEditorView
       model: new Quiz,
-      collection: @quizzes).render()
+      collection: @quizzes
 
   events:
     "click .x-create-test-data": "createTestData"
     "click .x-create-new": "createNewQuiz"
 
-# QuizEditorView creates and manages a top level tab for the Quiz.
+# QuizEditorView creates and manages a top level tab for a Quiz.
+# Creates a clone of the model which is editted. The original model
+# is updated at the end.
 QuizEditorView = View.extend
 
   className: "tab-pane"
 
   # Create the top level tab and select it
-  render: ->
+  initialize: ->
+
+    @originalModel = @model
+    @model = @model.clone()
+    @valid = not @model.isNew()
+
     tabId = _.uniqueId "quiztab_"
 
     $("#top-level-tabs > ul").append(
@@ -172,30 +189,12 @@ QuizEditorView = View.extend
     @populateFields()
 
     @model.on "change:title", @updateTabTitle, this
-    @model.on "change", @updateSaveButton, this
+    @on "checkvalid", @checkValid, this
 
     # Move the cursor into the title field
-    @$(".x-title").select()
+    @$(".x-title input").select()
 
   remove: ->
-    @$el.remove()
-
-  updateTabTitle: ->
-    @viewTab.html @quizName()
-
-  # Disables the save button unless the model is valid
-  updateSaveButton: ->
-    @$(".x-save").attr "disabled", not @model.isValid()
-
-  populateFields: ->
-    @$(".x-title").val(@model.get("title"))
-    @$(".x-location").val(@model.get("location"))
-
-  removeView: ->
-    # TODO: Leaves event listeners on the model, but the model should only
-    # be accessible to this instance anyway.
-
-    # Display the main tab
     displayFirstTab()
 
     @$(".x-cancel").tooltip "hide"
@@ -203,7 +202,25 @@ QuizEditorView = View.extend
     # And the LI containing the tab's A
     @viewTab.parent().remove()
 
-    @remove()
+    @$el.remove()
+
+    # Don't have to worry about model events, since
+    # because we cloned the original model
+
+  updateTabTitle: ->
+    @viewTab.html @quizName()
+
+  refreshValid: ->
+    @valid = @$(".control-group.error").length == 0
+    @updateSaveButton()
+
+  # Disables the save button unless @valid
+  updateSaveButton: ->
+    @$(".x-save").attr "disabled", not @valid
+
+  populateFields: ->
+    @$(".x-title input").val(@model.get("title"))
+    @$(".x-location input").val(@model.get("location"))
 
   quizName: ->
     @model.escape("title") || "<em>New Quiz</em>"
@@ -211,14 +228,25 @@ QuizEditorView = View.extend
   # Looks like a bit of boilerplate to keep the model
   # and the view synchronized here.
   storeTitle: ->
-    @model.set "title", @$(".x-title").val()
+    title = event.target.value
 
-  storeLocation: ->
-    @model.set "location", @$(".x-location").val()
+    @model.set "title", title
+
+    if isBlank title
+      @$(".x-title .help-inline").html "Title may not be blank"
+      @$(".x-title").addClass "error"
+    else
+      @$(".x-title").removeClass "error"
+
+    @refreshValid()
+
+  storeLocation: (event) ->
+    @model.set "location", event.target.value
 
   doCancel: ->
     # TODO: A modal warning
-    @removeView()
+
+    @remove()
 
   errorAlert: (message) ->
     alert = fromMustacheTemplate "standard-error-alert",
@@ -236,25 +264,20 @@ QuizEditorView = View.extend
 
       success: (model, response) =>
         b.button("reset")
-        switch response.result
-          when "ok"
-            @removeView()
-            @collection.add new Quiz(response.quiz), at: 0
-          when "fail"
-            @errorAlert response.message
-            # The "error" class name goes on the div.control-group around the
-            # text field.
-            @$(".x-#{response.hint}")
-              .select()
-              .parents(".control-group")
-              .addClass("error")
-          else
-            @errorAlert "Unexpected response from server."
+        @remove()
+        insert = @originalModel.isNew()
 
+        # Copy stuff over to the original mode
+        @originalModel.set @model
+
+        # Add to top of collection if was new (otherwise
+        # it must already be in place inside the collection).
+        if insert
+          @collection.add new Quiz(@originalModel), at: 0
 
   events:
-    "change .x-title": "storeTitle"
-    "change .x-location": "storeLocation"
+    "change .x-title input": "storeTitle"
+    "change .x-location input": "storeLocation"
     "click .x-cancel" : "doCancel"
     "click .x-save" : "doSave"
 
