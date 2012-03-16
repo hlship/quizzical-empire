@@ -14,11 +14,14 @@ fromMustacheTemplate = (scriptId, attributes) ->
 isBlank = (str) ->
   _.isNull(str) or
   _.isUndefined(str) or
-  str.trim() == ""
+  str.trim() is ""
 
 Quiz = Model.extend
   idAttribute: "_id"
   urlRoot: "/api/quiz"
+  validate:
+    title:
+      required: true
 
 Round = Model.extend
 
@@ -107,8 +110,8 @@ QuizTableView = View.extend
 
     @$(".x-create-test-data").popover
       title: "For Testing"
-      content: """Creates many Quizzes with random text, for testing purposes.
-                This will be removed in the final application."""
+      content: "Creates many Quizzes with random text, for testing purposes.
+                This will be removed in the final application."
 
   addOne: (quiz, collection, options) ->
     view = new QuizTableRowView
@@ -128,7 +131,7 @@ QuizTableView = View.extend
     @render()
 
   render: ->
-    if @quizzes.length == 0
+    if @quizzes.length is 0
       @$(".alert").show()
       @$("table").hide()
     else
@@ -170,7 +173,6 @@ QuizEditorView = View.extend
 
     @originalModel = @model
     @model = @model.clone()
-    @valid = not @model.isNew()
 
     tabId = _.uniqueId "quiztab_"
 
@@ -184,18 +186,19 @@ QuizEditorView = View.extend
 
     @$(".x-cancel").tooltip()
 
-    @updateSaveButton()
-
     @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
 
     @viewTab.tab "show"
 
     $("#top-level-tabs .nav-tabs a:last").tab "show"
 
-    @populateFields()
+    @linkFields()
+    @updateSaveButton()
 
+    # More boilerplate.  Kind of wish there was a special
+    # Backbone event for unvalidated changes.
     @model.on "change:title", @updateTabTitle, this
-    @on "checkvalid", @checkValid, this
+    @model.on "change", @updateSaveButton, this
 
     # Move the cursor into the title field
     @$(".x-title input").select()
@@ -206,15 +209,59 @@ QuizEditorView = View.extend
       model: @model
       el: @$(".x-rounds").first()
 
+  linkFields: ->
+    @linkField "title", null,
+      required: "A title for the quiz is required"
+    @linkField "location"
+
+  linkField: (name, className = ".x-#{name}", errorMessages) ->
+    $container = @$(className)
+    $field = $container.find "input"
+    $help = $container.find ".help-inline"
+
+    initialHelpText = $help.html()
+
+    @model.on "error:#{name}", (model, errors) ->
+      $container.addClass "error"
+
+      # One error is usually enough. Find the first that has a
+      # registrered message.
+      message = _.chain(errors[name])
+        .map((err) -> errorMessages[err])
+        .reject(_.isNull)
+        .first()
+        .value() || "Invalid input"
+
+      $help.html message
+
+    @model.on "change:#{name}", (model, value) ->
+      # We don't update the field itself, because currently changes
+      # are always directed from form input out of the field
+      $container.removeClass "error"
+      $help.html initialHelpText
+
+    $field.val @model.get(name)
+
+    $field.on "change", (event) =>
+      # Trigger event, possibly firing error events
+      newValue = event.target.value
+      valid = @model.set name, newValue
+      # Force the issue, to get the model into an invalid state
+      if not valid
+        @model.set name, newValue, silent:true
+        @updateSaveButton()
+
   remove: ->
     displayFirstTab()
 
+    # Sometimes the tooltip stays after the rest of the UI is discarded,
+    # so make sure it is hidden.
     @$(".x-cancel").tooltip "hide"
+
+    @$el.remove()
 
     # And the LI containing the tab's A
     @viewTab.parent().remove()
-
-    @$el.remove()
 
     # Don't have to worry about model events, since
     # because we cloned the original model
@@ -222,44 +269,22 @@ QuizEditorView = View.extend
   updateTabTitle: ->
     @viewTab.html @quizName()
 
-  refreshValid: ->
-    @valid = @$(".control-group.error").length == 0
-    @updateSaveButton()
-
-  # Disables the save button unless @valid
+  # Disables the save button unless model is valid
   updateSaveButton: ->
-    @$(".x-save").attr "disabled", not @valid
+    # TODO: May need to make this smarter, event based,
+    # to deal with nested models that may also be invalid.
+    @$(".x-save").attr "disabled", not @model.isValid()
 
-  populateFields: ->
-    @$(".x-title input").val(@model.get("title"))
-    @$(".x-location input").val(@model.get("location"))
-
+ # Handles the case, for new models, that the title may be blank.
   quizName: ->
     @model.escape("title") || "<em>New Quiz</em>"
-
-  # Looks like a bit of boilerplate to keep the model
-  # and the view synchronized here.
-  storeTitle: ->
-    title = event.target.value
-
-    @model.set "title", title
-
-    if isBlank title
-      @$(".x-title .help-inline").html "Title may not be blank"
-      @$(".x-title").addClass "error"
-    else
-      @$(".x-title").removeClass "error"
-
-    @refreshValid()
-
-  storeLocation: (event) ->
-    @model.set "location", event.target.value
 
   doCancel: ->
     # TODO: A modal warning
 
     @remove()
 
+  # Used to display server-side errors when saving/updating the model.
   errorAlert: (message) ->
     alert = fromMustacheTemplate "standard-error-alert",
       content: message
@@ -288,8 +313,6 @@ QuizEditorView = View.extend
           @collection.add new Quiz(@originalModel), at: 0
 
   events:
-    "change .x-title input": "storeTitle"
-    "change .x-location input": "storeLocation"
     "click .x-cancel" : "doCancel"
     "click .x-save" : "doSave"
 
