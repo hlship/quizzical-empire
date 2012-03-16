@@ -23,7 +23,51 @@ Quiz = Model.extend
     title:
       required: true
 
-Round = Model.extend
+Round = Model.extend()
+
+FormView = View.extend
+
+  # Links a model attribute to a field.
+  # name - attribute name
+  # className - used to select the container of the field
+  # errorMessages -- used to translate validation names (such as
+  # "required") to a user-presentable message.
+  linkField: (name, className = ".x-#{name}", errorMessages) ->
+    $container = @$(className)
+    $field = $container.find "input"
+    $help = $container.find ".help-inline"
+
+    initialHelpText = $help.html()
+
+    @model.on "error:#{name}", (model, errors) ->
+      $container.addClass "error"
+
+      # One error is usually enough. Find the first that has a
+      # registrered message.
+      message = _.chain(errors[name])
+        .map((err) -> errorMessages[err])
+        .reject(_.isNull)
+        .first()
+        .value() || "Invalid input"
+
+      $help.html message
+
+    @model.on "change:#{name}", (model, value) ->
+      # We don't update the field itself, because currently changes
+      # are always directed from form input out of the field
+      $container.removeClass "error"
+      $help.html initialHelpText
+
+    $field.val @model.get(name)
+
+    $field.on "change", (event) =>
+      # Trigger event, possibly firing error events
+      newValue = event.target.value
+      valid = @model.set name, newValue
+      # Force the issue, to get the model into an invalid state
+      if not valid
+        @model.set name, newValue, silent:true
+        @trigger "invalidated", this
 
 QuizList = Collection.extend
   model: Quiz
@@ -164,7 +208,7 @@ QuizTableView = View.extend
 # updated at the end.  TODO: Split this up into one View for handling
 # the tabs and the save/cancel button, and additional views for
 # everything else.
-QuizEditorView = View.extend
+QuizEditorView = FormView.extend
 
   className: "tab-pane"
 
@@ -199,6 +243,7 @@ QuizEditorView = View.extend
     # Backbone event for unvalidated changes.
     @model.on "change:title", @updateTabTitle, this
     @model.on "change", @updateSaveButton, this
+    @on "invalidated", @disableSaveButton, this
 
     # Move the cursor into the title field
     @$(".x-title input").select()
@@ -213,43 +258,6 @@ QuizEditorView = View.extend
     @linkField "title", null,
       required: "A title for the quiz is required"
     @linkField "location"
-
-  linkField: (name, className = ".x-#{name}", errorMessages) ->
-    $container = @$(className)
-    $field = $container.find "input"
-    $help = $container.find ".help-inline"
-
-    initialHelpText = $help.html()
-
-    @model.on "error:#{name}", (model, errors) ->
-      $container.addClass "error"
-
-      # One error is usually enough. Find the first that has a
-      # registrered message.
-      message = _.chain(errors[name])
-        .map((err) -> errorMessages[err])
-        .reject(_.isNull)
-        .first()
-        .value() || "Invalid input"
-
-      $help.html message
-
-    @model.on "change:#{name}", (model, value) ->
-      # We don't update the field itself, because currently changes
-      # are always directed from form input out of the field
-      $container.removeClass "error"
-      $help.html initialHelpText
-
-    $field.val @model.get(name)
-
-    $field.on "change", (event) =>
-      # Trigger event, possibly firing error events
-      newValue = event.target.value
-      valid = @model.set name, newValue
-      # Force the issue, to get the model into an invalid state
-      if not valid
-        @model.set name, newValue, silent:true
-        @updateSaveButton()
 
   remove: ->
     displayFirstTab()
@@ -275,7 +283,10 @@ QuizEditorView = View.extend
     # to deal with nested models that may also be invalid.
     @$(".x-save").attr "disabled", not @model.isValid()
 
- # Handles the case, for new models, that the title may be blank.
+  disableSaveButton: ->
+    @$(".x-save").attr "disabled", true
+
+  # Handles the case, for new models, that the title may be blank.
   quizName: ->
     @model.escape("title") || "<em>New Quiz</em>"
 
@@ -323,7 +334,7 @@ QuizRoundsEditorView = View.extend
     @$el.html readTemplate "rounds-editor"
 
 
-NormalRoundView = View.extend
+NormalRoundView = FormView.extend
 
 roundTypeToView =
   normal: NormalRoundView
