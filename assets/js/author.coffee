@@ -153,8 +153,10 @@ QuizTableView = View.extend
     "click .x-create-new": "createNewQuiz"
 
 # QuizEditorView creates and manages a top level tab for a Quiz.
-# Creates a clone of the model which is editted. The original model
-# is updated at the end.
+# Creates a clone of the model which is editted. The original model is
+# updated at the end.  TODO: Split this up into one View for handling
+# the tabs and the save/cancel button, and additional views for
+# everything else.
 QuizEditorView = View.extend
 
   className: "tab-pane"
@@ -193,6 +195,12 @@ QuizEditorView = View.extend
 
     # Move the cursor into the title field
     @$(".x-title input").select()
+
+    # Create a nested view that's responsible for editting, adding,
+    # and deleting Rounds
+    new QuizRoundsEditorView
+      model: @model
+      el: @$(".x-rounds").first()
 
   remove: ->
     displayFirstTab()
@@ -280,6 +288,13 @@ QuizEditorView = View.extend
     "change .x-location input": "storeLocation"
     "click .x-cancel" : "doCancel"
     "click .x-save" : "doSave"
+
+# Manages the QuizRoundEditorViews for the rounds collection of the
+# Quiz model. Also includes a control to add new Quiz rounds.
+QuizRoundsEditorView = View.extend
+  initialize: ->
+    @$el.html readTemplate "rounds-editor"
+
 
 # Now some page-load-time initialization:
 

@@ -8,4 +8,5 @@ module.exports = (app) ->
       res.render "author",
         title: "Quizzical Empire"
 
+
   require("./api")(app)

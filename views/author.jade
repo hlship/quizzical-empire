@@ -66,6 +66,19 @@ block templates
         rel="tooltip"
         data-placement="right"
         title="Discard changes, close tab") Cancel
+
+  script#rounds-editor(type="text/template")
+    .x-current-rounds
+    .x-add-new-round
+      | Add a new
+      select.span2
+        each type in [ "normal", "challenge", "wager" ]
+          option(value=type) #{type}
+      |  round:
+      button.btn.btn-mini.x-add
+        i.icon-plus
+        | Add
+
   script#delete-quiz-modal(type="text/template")
     .modal
       .modal-header
