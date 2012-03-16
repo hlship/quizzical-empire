@@ -6,7 +6,7 @@ displayFirstTab = ->
   $("#top-level-tabs a:first").tab "show"
 
 readTemplate = (scriptId) ->
-  jQuery("##{scriptId}").get(0).innerHTML
+  $("##{scriptId}").html()
 
 fromMustacheTemplate = (scriptId, attributes) ->
   Mustache.render readTemplate(scriptId), attributes
@@ -67,7 +67,7 @@ FormView = View.extend
       # Force the issue, to get the model into an invalid state
       if not valid
         @model.set name, newValue, silent:true
-        @trigger "invalidated", this
+        @model.trigger "invalidated", this
 
 QuizList = Collection.extend
   model: Quiz
@@ -236,28 +236,26 @@ QuizEditorView = FormView.extend
 
     $("#top-level-tabs .nav-tabs a:last").tab "show"
 
-    @linkFields()
     @updateSaveButton()
 
     # More boilerplate.  Kind of wish there was a special
     # Backbone event for unvalidated changes.
     @model.on "change:title", @updateTabTitle, this
     @model.on "change", @updateSaveButton, this
-    @on "invalidated", @disableSaveButton, this
+    @model.on "invalidated", @disableSaveButton, this
 
     # Move the cursor into the title field
     @$(".x-title input").select()
+
+    new QuizFieldsEditorView
+      model: @model
+      el: @$(".x-quiz-fields")
 
     # Create a nested view that's responsible for editting, adding,
     # and deleting Rounds
     new QuizRoundsEditorView
       model: @model
-      el: @$(".x-rounds").first()
-
-  linkFields: ->
-    @linkField "title", null,
-      required: "A title for the quiz is required"
-    @linkField "location"
+      el: @$(".x-rounds")
 
   remove: ->
     displayFirstTab()
@@ -326,6 +324,14 @@ QuizEditorView = FormView.extend
   events:
     "click .x-cancel" : "doCancel"
     "click .x-save" : "doSave"
+
+
+QuizFieldsEditorView = FormView.extend
+  initialize: ->
+    @$el.html readTemplate "quiz-fields-view"
+    @linkField "title", null,
+      required: "A title for the quiz is required"
+    @linkField "location"
 
 # Manages the QuizRoundEditorViews for the rounds collection of the
 # Quiz model. Also includes a control to add new Quiz rounds.

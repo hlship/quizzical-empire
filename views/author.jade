@@ -47,18 +47,11 @@ block templates
         li: a.x-delete(href="#")
           i.icon-remove
           | Delete
+
   script#quiz-edit-form(type="text/template")
     .x-alert-container
     form.well(action="#")
-      .control-group.x-title
-        label Quiz Title
-        .controls
-          input.span4(type="text")
-          span.help-inline Title or theme for the Quiz
-      .control-group.x-location
-        label Location
-        input.span4(type="text")
-        span.help-inline Location where Quiz will take place
+      .x-quiz-fields
       .row
         .x-rounds.offset1
       button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
@@ -67,6 +60,17 @@ block templates
         rel="tooltip"
         data-placement="right"
         title="Discard changes, close tab") Cancel
+
+  script#quiz-fields-view(type="text/template")
+    .control-group.x-title
+      label Quiz Title
+      .controls
+        input.span4(type="text")
+        span.help-inline Title or theme for the Quiz
+    .control-group.x-location
+      label Location
+      input.span4(type="text")
+      span.help-inline Location where Quiz will take place
 
   script#rounds-editor(type="text/template")
     .x-current-rounds
