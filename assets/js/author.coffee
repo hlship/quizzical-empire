@@ -1,5 +1,7 @@
 [Model, Collection, View] = [Backbone.Model, Backbone.Collection, Backbone.View]
 
+$ = window.jQuery
+
 displayFirstTab = ->
   $("#top-level-tabs a:first").tab "show"
 
@@ -17,6 +19,8 @@ isBlank = (str) ->
 Quiz = Model.extend
   idAttribute: "_id"
   urlRoot: "/api/quiz"
+
+Round = Model.extend
 
 QuizList = Collection.extend
   model: Quiz
@@ -294,6 +298,14 @@ QuizEditorView = View.extend
 QuizRoundsEditorView = View.extend
   initialize: ->
     @$el.html readTemplate "rounds-editor"
+
+
+NormalRoundView = View.extend
+
+roundTypeToView =
+  normal: NormalRoundView
+  challenge: undefined
+  wager: undefined
 
 
 # Now some page-load-time initialization:
