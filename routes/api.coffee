@@ -30,6 +30,10 @@ saveAndReturnQuiz = (res, quiz) ->
 
     res.send doc
 
+getAndReturnQuiz = (req, res) ->
+  quiz = Quiz.findById req.params.id,
+    handleError res, (doc) -> res.send doc
+
 module.exports = (app) ->
 
   # Create a new Quiz
@@ -46,10 +50,11 @@ module.exports = (app) ->
           _.extend quiz, req.body
           saveAndReturnQuiz res, quiz
 
-  app.get "/api/quiz/:id",
-    (req, res) ->
-      quiz = Quiz.findById req.params.id,
-        handleError res, (doc) -> res.send doc
+  # A Backbone odditty: a Model that comes from a Collection is always
+  # saved back based on the same URL from which the collection as a
+  # whole was obtained.
+  app.get "/api/quiz/:id", getAndReturnQuiz
+  app.get "/api/quizzes/:id", getAndReturnQuiz
 
   # Returns all documents, ordered by creation date (most recent first)
   app.get "/api/quizzes",
