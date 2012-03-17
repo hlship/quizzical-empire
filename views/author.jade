@@ -13,7 +13,7 @@ block content
       #quiz-table-view.tab-pane
 
 block templates
-  script#quiz-table-template(type="text/template")
+  script#QuizTableView(type="text/template")
     .alert
       strong.
         No Quizzes have been created yet ... feel free to start creating some!
@@ -31,7 +31,8 @@ block templates
       &nbsp;
       button.btn.x-create-test-data(data-loading-text="Loading ...").
         Create Test Quizzes
-  script#quiz-table-row-template(type="text/template")
+
+  script#QuizTableRowView(type="text/template")
     td {{title}}
     td {{location}}
     td {{created}}
@@ -48,7 +49,7 @@ block templates
           i.icon-remove
           | Delete
 
-  script#quiz-edit-form(type="text/template")
+  script#QuizEditorView(type="text/template")
     .x-alert-container
     form.well(action="#")
       .x-quiz-fields
@@ -61,7 +62,7 @@ block templates
         data-placement="right"
         title="Discard changes, close tab") Cancel
 
-  script#quiz-fields-view(type="text/template")
+  script#QuizFieldsEditorView(type="text/template")
     .control-group.x-title
       label Quiz Title
       .controls
@@ -72,8 +73,8 @@ block templates
       input.span4(type="text")
       span.help-inline Location where Quiz will take place
 
-  script#rounds-editor(type="text/template")
-    .x-current-rounds
+  script#QuizRoundsEditorView(type="text/template")
+    .x-round-container
     .x-add-new-round
       | Add a new
       select.span2
@@ -84,7 +85,13 @@ block templates
         i.icon-plus
         | Add
 
-  script#delete-quiz-modal(type="text/template")
+  script#NormalRoundEditView(type="text/template")
+    .row.well
+      .span4 Round # {{index}} (normal)
+      .span1.offset7
+        button.btn.btn-danger.btn-mini Delete
+
+  script#ConfirmDeleteDialog(type="text/template")
     .modal
       .modal-header
         a.close(data-dismiss="modal") &times;
@@ -97,6 +104,7 @@ block templates
       .modal-footer
         button.btn.btn-danger.x-confirm(data-dismiss="modal") Delete Quiz
         button.btn.x-close(data-dismiss="modal") Close
+
    script#standard-error-alert(type="text/template")
      div.alert.alert-error.fade.in
        a.close(data-dismiss="alert", href="#") &times;

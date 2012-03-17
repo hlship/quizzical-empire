@@ -18,12 +18,22 @@ isBlank = (str) ->
 
 Quiz = Model.extend
   idAttribute: "_id"
-  urlRoot: "/api/quiz"
   validate:
     title:
       required: true
+  default: ->
+    rounds: [] # of Round
 
-Round = Model.extend()
+# What does Backbone do with nested entities without
+# their own id?
+Round = Model.extend
+  default: ->
+    questions: [] # of Question
+
+RoundCollection = Collection.extend
+  model: Round
+
+Question = Model.extend()
 
 FormView = View.extend
 
@@ -76,10 +86,7 @@ QuizList = Collection.extend
 ConfirmDeleteDialog = View.extend
 
   initialize: ->
-    @render()
-
-  render: ->
-    @$el.html fromMustacheTemplate "delete-quiz-modal",
+    @$el.html fromMustacheTemplate "ConfirmDeleteDialog",
       title: @model.escape "title"
 
     $("body").append(@$el)
@@ -107,7 +114,7 @@ QuizTableRowView = View.extend
     @model.on "change", @render, this
     @model.on "destroy", @remove, this
 
-    @template = readTemplate "quiz-table-row-template"
+    @template = readTemplate "QuizTableRowView"
 
   events:
     "click .x-delete": "deleteDialog"
@@ -128,9 +135,19 @@ QuizTableRowView = View.extend
 
   editQuiz: ->
 
-    new QuizEditorView
-      model: @model
-      collection: @collection
+
+    # Get the very latest version of the model, which is useful
+    # because it may have changed since the colleciton was loaded, and
+    # because the collection uses a truncated view of the data.
+
+    @model.fetch
+      error: (model, response) ->
+        # TODO: Display a property Backbone alert
+        window.alert response.responseText or response.statusText
+      success: =>
+        new QuizEditorView
+          model: @model
+          collection: @collection
 
 # Owns the table that displays the current list of Quizzes, including
 # the buttons used to create a new quiz, etc.
@@ -140,7 +157,7 @@ QuizTableView = View.extend
 
     @quizzes = new QuizList
 
-    @$el.html $("#quiz-table-template").html()
+    @$el.html readTemplate "QuizTableView"
 
     # Hide the alert and the table initially, while the content is
     # being fetched via Ajax
@@ -225,8 +242,9 @@ QuizEditorView = FormView.extend
 
     # Set the id attribute, read the template containing the form,
     # and move it into place.
-    @$el.attr("id", tabId).html(
-      readTemplate "quiz-edit-form").appendTo("#top-level-tabs > .tab-content")
+    @$el.attr("id", tabId)
+      .html(readTemplate "QuizEditorView")
+      .appendTo("#top-level-tabs > .tab-content")
 
     @$(".x-cancel").tooltip()
 
@@ -322,13 +340,13 @@ QuizEditorView = FormView.extend
           @collection.add new Quiz(@originalModel), at: 0
 
   events:
-    "click .x-cancel" : "doCancel"
-    "click .x-save" : "doSave"
+    "click .x-cancel": "doCancel"
+    "click .x-save": "doSave"
 
 
 QuizFieldsEditorView = FormView.extend
   initialize: ->
-    @$el.html readTemplate "quiz-fields-view"
+    @$el.html readTemplate "QuizFieldsEditorView"
     @linkField "title", null,
       required: "A title for the quiz is required"
     @linkField "location"
@@ -337,13 +355,48 @@ QuizFieldsEditorView = FormView.extend
 # Quiz model. Also includes a control to add new Quiz rounds.
 QuizRoundsEditorView = View.extend
   initialize: ->
-    @$el.html readTemplate "rounds-editor"
+    @$el.html readTemplate "QuizRoundsEditorView"
+
+    @collection = new RoundCollection @model.get "rounds"
+
+    @container = @$(".x-round-container")
+
+    @collection.each (round, i) ->
+      round.set "index", i + 1
+      @createRoundView round
+
+  createRoundView: (round) ->
+    ctor = roundTypeToView[round.get("type")]
+    view = new ctor
+      model: round
+      collection: @collection
+
+    view.setContainer @container
 
 
-NormalRoundView = FormView.extend
+  addNewRound: ->
+    type = @$(".x-add-new-round select").val()
+    round = new Round
+      type: type
+      index: @collection.length + 1
+    @collection.add round
+    @createRoundView round
+
+  events:
+    "click .x-add": "addNewRound"
+
+
+NormalRoundEditView = FormView.extend
+  initialize: ->
+    @$el.html fromMustacheTemplate "NormalRoundEditView",
+      index: @model.get "index"
+
+  setContainer: (container) ->
+    container.append @el
+
 
 roundTypeToView =
-  normal: NormalRoundView
+  normal: NormalRoundEditView
   challenge: undefined
   wager: undefined
 
