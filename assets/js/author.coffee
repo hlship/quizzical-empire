@@ -2,11 +2,9 @@
 
 $ = window.jQuery
 
-displayFirstTab = ->
-  $("#top-level-tabs a:first").tab "show"
+displayFirstTab = -> $("#top-level-tabs a:first").tab "show"
 
-readTemplate = (scriptId) ->
-  $("##{scriptId}").html()
+readTemplate = (scriptId) -> $("##{scriptId}").html()
 
 fromMustacheTemplate = (scriptId, attributes) ->
   Mustache.render readTemplate(scriptId), attributes
@@ -18,17 +16,18 @@ isBlank = (str) ->
 
 Quiz = Model.extend
   idAttribute: "_id"
-  validate:
-    title:
-      required: true
   default: ->
     rounds: [] # of Round
+  enableSave: ->
+    (not isBlank @get "title") and
+    _(@get "round").all (round) -> round.enableSave()
 
 # What does Backbone do with nested entities without
 # their own id?
 Round = Model.extend
   default: ->
     questions: [] # of Question
+  enableSave: -> true
 
 RoundCollection = Collection.extend
   model: Round
@@ -40,44 +39,15 @@ FormView = View.extend
   # Links a model attribute to a field.
   # name - attribute name
   # className - used to select the container of the field
-  # errorMessages -- used to translate validation names (such as
-  # "required") to a user-presentable message.
-  linkField: (name, className = ".x-#{name}", errorMessages) ->
+  linkField: (name, className = ".x-#{name}") ->
     $container = @$(className)
     $field = $container.find "input"
-    $help = $container.find ".help-inline"
-
-    initialHelpText = $help.html()
-
-    @model.on "error:#{name}", (model, errors) ->
-      $container.addClass "error"
-
-      # One error is usually enough. Find the first that has a
-      # registrered message.
-      message = _.chain(errors[name])
-        .map((err) -> errorMessages[err])
-        .reject(_.isNull)
-        .first()
-        .value() || "Invalid input"
-
-      $help.html message
-
-    @model.on "change:#{name}", (model, value) ->
-      # We don't update the field itself, because currently changes
-      # are always directed from form input out of the field
-      $container.removeClass "error"
-      $help.html initialHelpText
 
     $field.val @model.get(name)
 
     $field.on "change", (event) =>
-      # Trigger event, possibly firing error events
       newValue = event.target.value
-      valid = @model.set name, newValue
-      # Force the issue, to get the model into an invalid state
-      if not valid
-        @model.set name, newValue, silent:true
-        @model.trigger "invalidated", this
+      @model.set name, newValue
 
 QuizList = Collection.extend
   model: Quiz
@@ -260,7 +230,6 @@ QuizEditorView = FormView.extend
     # Backbone event for unvalidated changes.
     @model.on "change:title", @updateTabTitle, this
     @model.on "change", @updateSaveButton, this
-    @model.on "invalidated", @disableSaveButton, this
 
     # Move the cursor into the title field
     @$(".x-title input").select()
@@ -297,10 +266,7 @@ QuizEditorView = FormView.extend
   updateSaveButton: ->
     # TODO: May need to make this smarter, event based,
     # to deal with nested models that may also be invalid.
-    @$(".x-save").attr "disabled", not @model.isValid()
-
-  disableSaveButton: ->
-    @$(".x-save").attr "disabled", true
+    @$(".x-save").attr "disabled", not @model.enableSave()
 
   # Handles the case, for new models, that the title may be blank.
   quizName: ->
