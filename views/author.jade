@@ -91,18 +91,14 @@ block templates
       .span1.offset7
         button.btn.btn-danger.btn-mini Delete
 
-  script#ConfirmDeleteDialog(type="text/template")
+  script#ConfirmDialog(type="text/template")
     .modal
       .modal-header
         a.close(data-dismiss="modal") &times;
-        h3 Really delete quiz?
-      .modal-body
-        p
-          | Deletion of quiz
-          strong {{title}}
-          |  is immediate, and cannot be undone.
+        h3 {{title}}
+      .modal-body {{{body}}}
       .modal-footer
-        button.btn.btn-danger.x-confirm(data-dismiss="modal") Delete Quiz
+        button.btn.btn-danger.x-confirm(data-dismiss="modal") {{label}}
         button.btn.x-close(data-dismiss="modal") Close
 
    script#standard-error-alert(type="text/template")
@@ -110,3 +106,4 @@ block templates
        a.close(data-dismiss="alert", href="#") &times;
        h4.alert-heading Error!
        | {{content}}
+

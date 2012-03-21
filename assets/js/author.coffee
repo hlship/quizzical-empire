@@ -53,11 +53,21 @@ QuizList = Collection.extend
   model: Quiz
   url: "/api/quizzes"
 
-ConfirmDeleteDialog = View.extend
+# Raises a modal confirmation dialog. Details are provided in additional options
+# passed to the constructor:
+# options.title -- Title for the modal header
+# options.body -- Markup for the body of the dialog
+# options.label -- Label for the primary button
+# options.buttonClass -- Additional CSS class for the
+# primary button, default: "btn-primary"
+#
+# Triggers a "confirmed" event if the user clicks the confirm button. No event
+# is triggered if the user dismisses the dialog or clicks the close button.
+ConfirmDialog = View.extend
 
   initialize: ->
-    @$el.html fromMustacheTemplate "ConfirmDeleteDialog",
-      title: @model.escape "title"
+    @$el.html fromMustacheTemplate "ConfirmDialog", @options
+    @$(".x-confirm").addClass @options.buttonClass or "btn-primary"
 
     $("body").append(@$el)
 
@@ -71,7 +81,7 @@ ConfirmDeleteDialog = View.extend
     @$el.modal "hide"
 
    doConfirm: ->
-     @trigger "confirm", @model
+     @trigger "confirm"
 
    events:
     "click .x-confirm": "doConfirm"
@@ -101,7 +111,16 @@ QuizTableRowView = View.extend
 
   deleteDialog: ->
 
-    new ConfirmDeleteDialog(model: @model).on "confirm", => @model.destroy()
+    title = @model.escape "title"
+
+    dialog = new ConfirmDialog
+      title: "Really delete Quiz?"
+      body: "<p>Deletion of quiz <strong>#{title}</strong>
+is immediate and can not be undone.</p>"
+      label: "Delete Quiz"
+      buttonClass: "btn-danger"
+
+    dialog.on "confirm", => @model.destroy()
 
   editQuiz: ->
 
