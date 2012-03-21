@@ -60,8 +60,5 @@ ConfirmDialog = View.extend
     "click .x-confirm": "doConfirm"
     "click .btn": "dismissDialog"
 
-_.extend Quizzical,
-  fromMustacheTemplate: fromMustacheTemplate
-  readTemplate: readTemplate
-  ConfirmDialog: ConfirmDialog
-  FormView: FormView
+_.extend Quizzical, {fromMustacheTemplate, readTemplate,
+  ConfirmDialog, FormView }

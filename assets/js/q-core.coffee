@@ -14,7 +14,7 @@ isBlank = (str) ->
   str.trim() is ""
 
 # Models and Collections
-#
+
 Quiz = Model.extend
   idAttribute: "_id"
   default: ->
@@ -39,11 +39,6 @@ QuizList = Collection.extend
   model: Quiz
   url: "/api/quizzes"
 
-
-window.Quizzical =
-  isBlank: isBlank
-  Question: Question
-  Quiz: Quiz
-  QuizList: QuizList
-  Round: Round
-  RoundCollection : RoundCollection
+# Destructuring local names into an object FTW!
+window.Quizzical = {isBlank, Question, Quiz, QuizList,
+  Round, RoundCollection }
