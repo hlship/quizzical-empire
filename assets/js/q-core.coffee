@@ -17,6 +17,7 @@ isBlank = (str) ->
 
 Quiz = Model.extend
   idAttribute: "_id"
+  urlRoot: "/api/quiz"
   default: ->
     rounds: [] # of Round
   enableSave: ->
