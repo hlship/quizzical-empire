@@ -26,6 +26,9 @@ Round = new Schema
     type: String
     required: true
     enum: ["normal", "challenge", "wager"]
+  title:
+    type: String
+    required: true
   questions: [Question]
   { strict: true }
 
