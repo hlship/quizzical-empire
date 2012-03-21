@@ -85,11 +85,26 @@ block append templates
         i.icon-plus
         | Add
 
-  script#NormalRoundEditView(type="text/template")
+  script#RoundHeaderView(type="text/template")
     .row.well
-      .span4 Round # {{index}} (normal)
-      .span1.offset7
-        button.btn.btn-danger.btn-mini Delete
+      .x-round-header
+          .span4
+            | Round #
+            span.x-index 999
+            |  ({{type}})
+            em: span.x-title Round Title
+          .span1.offset7
+            button.btn.btn-danger.btn-mini.x-delete Delete
+    .row
+      .control-group.x-title
+        label Round Title
+        input.span4(type="text", required, rows=10, cols=100)
+        span.help-inline Title or theme for this round
+      .x-editor
+
+  script#NormalRoundEditView(type="text/template")
+    .control-group.x-placeholder
+      textarea.span8(rows=10, cols=100)
 
    script#standard-error-alert(type="text/template")
      div.alert.alert-error.fade.in
