@@ -275,16 +275,14 @@ QuizRoundsEditorView = View.extend
 
     @collection.on "all", => @model.trigger "dirty"
 
+    @collection.on "add remove", @renumberRounds, this
+
   createRoundView: (round) ->
     ctor = roundTypeToView[round.get("type")]
-    view = new ctor
-      model: round
-      collection: @collection
+    new ctor { model:round, @collection, @container }
 
-    view.setContainer @container
-
-
-  addNewRound: ->
+  addNewRound: (event) ->
+    event.preventDefault()
     type = @$(".x-add-new-round select").val()
     round = new Round
       type: type
@@ -292,18 +290,50 @@ QuizRoundsEditorView = View.extend
     @collection.add round
     @createRoundView round
 
+  renumberRounds: ->
+    index = 1
+    @collection.each (round) ->
+      round.set "index", index++
+
   events:
     "click .x-add": "addNewRound"
 
+RoundHeaderView = FormView.extend
+  initialize: ->
+    @$el.html fromMustacheTemplate "RoundHeaderView",
+      type: @model.get("type")
+
+    @linkElement "index"
+    # Can't use defaults since there's two .x-title elements
+    @linkElement "title", ".x-round-header .x-title", "No Title"
+    @linkField "title", ".control-group.x-title"
+
+    @$(".x-editor").html @options.editor
+
+  events:
+    "click .x-round-header .x-delete": "doDelete"
+
+  doDelete: (event) ->
+    event.preventDefault()
+
+    dialog = new ConfirmDialog
+      title: "Really delete?"
+      body: "<p>The entire round will be deleted, along with all questions.</p>"
+      label: "Delete Round"
+      buttonClass: "btn-danger"
+
+    dialog.on "confirm", =>
+      @remove()
+      @collection.remove @model
 
 NormalRoundEditView = FormView.extend
   initialize: ->
     @$el.html fromMustacheTemplate "NormalRoundEditView",
       index: @model.get "index"
 
-  setContainer: (container) ->
-    container.append @el
+    header = new RoundHeaderView { @model, @collection, editor: @$el}
 
+    @options.container.append header.$el
 
 roundTypeToView =
   normal: NormalRoundEditView

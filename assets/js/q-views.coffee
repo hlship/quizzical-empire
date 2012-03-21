@@ -11,9 +11,11 @@ FormView = View.extend
 
   # Links a model attribute to a field.
   # name - attribute name
-  # className - used to select the container of the field
-  linkField: (name, className = ".x-#{name}") ->
-    $container = @$(className)
+  # selector - used to select the container of the field, the container must
+  # contain an <input> element
+  # defaults to ".x-#{name}"
+  linkField: (name, selector = ".x-#{name}") ->
+    $container = @$(selector)
     $field = $container.find "input"
 
     $field.val @model.get(name)
@@ -21,6 +23,15 @@ FormView = View.extend
     $field.on "change", (event) =>
       newValue = event.target.value
       @model.set name, newValue
+
+  linkElement: (name, selector = ".x-#{name}", defaultText) ->
+    element = @$(selector)
+    update = =>
+      element.html (@model.escape name) or defaultText
+
+    # Update now, and on any future change
+    update()
+    @model.on "change:#{name}", update
 
 # Raises a modal confirmation dialog. Details are provided in additional options
 # passed to the constructor:
