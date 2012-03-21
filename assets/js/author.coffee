@@ -1,95 +1,12 @@
-[Model, Collection, View] = [Backbone.Model, Backbone.Collection, Backbone.View]
+# Create local aliases for values in the Quizzical namespace
+{Quiz, Round, RoundCollection, Question, QuizList, isBlank,
+  readTemplate,fromMustacheTemplate, FormView, ConfirmDialog} = Quizzical
+
+{View} = Backbone
 
 $ = window.jQuery
 
 displayFirstTab = -> $("#top-level-tabs a:first").tab "show"
-
-readTemplate = (scriptId) -> $("##{scriptId}").html()
-
-fromMustacheTemplate = (scriptId, attributes) ->
-  Mustache.render readTemplate(scriptId), attributes
-
-isBlank = (str) ->
-  _.isNull(str) or
-  _.isUndefined(str) or
-  str.trim() is ""
-
-Quiz = Model.extend
-  idAttribute: "_id"
-  default: ->
-    rounds: [] # of Round
-  enableSave: ->
-    (not isBlank @get "title") and
-    _(@get "round").all (round) -> round.enableSave()
-
-# What does Backbone do with nested entities without
-# their own id?
-Round = Model.extend
-  default: ->
-    questions: [] # of Question
-  enableSave: -> true
-
-RoundCollection = Collection.extend
-  model: Round
-
-Question = Model.extend()
-
-FormView = View.extend
-
-  # Links a model attribute to a field.
-  # name - attribute name
-  # className - used to select the container of the field
-  linkField: (name, className = ".x-#{name}") ->
-    $container = @$(className)
-    $field = $container.find "input"
-
-    $field.val @model.get(name)
-
-    $field.on "change", (event) =>
-      newValue = event.target.value
-      @model.set name, newValue
-
-QuizList = Collection.extend
-  model: Quiz
-  url: "/api/quizzes"
-
-# Raises a modal confirmation dialog. Details are provided in additional options
-# passed to the constructor:
-# options.title -- Title for the modal header
-# options.body -- Markup for the body of the dialog
-# options.label -- Label for the primary button, default: "Confirm"
-# options.buttonClass -- Additional CSS class for the
-# primary button, default: "btn-primary"
-#
-# Triggers a "confirmed" event if the user clicks the confirm button. No event
-# is triggered if the user dismisses the dialog or clicks the close button.
-ConfirmDialog = View.extend
-
-  initialize: ->
-    @$el.html fromMustacheTemplate "ConfirmDialog",
-      title: @options.title
-      body: @options.body
-      label: @options.label or "Confirm"
-
-    @$(".x-confirm").addClass @options.buttonClass or "btn-primary"
-
-    $("body").append(@$el)
-
-    @$el.addClass "fade in"
-
-    # After the modal dialog is hidden, remove it from the DOM
-    @$el.modal().on "hidden", =>
-      @remove()
-
-   dismissDialog: ->
-    @$el.modal "hide"
-
-   doConfirm: ->
-     @trigger "confirm"
-
-   events:
-    "click .x-confirm": "doConfirm"
-    "click .btn": "dismissDialog"
 
 QuizTableRowView = View.extend
   tagName: "tr"
@@ -336,13 +253,11 @@ QuizEditorView = FormView.extend
     "click .x-cancel": "doCancel"
     "click .x-save": "doSave"
 
-
 QuizFieldsEditorView = FormView.extend
   initialize: ->
     @$el.html readTemplate "QuizFieldsEditorView"
-    @linkField "title", null,
-      required: "A title for the quiz is required"
-    @linkField "location"
+
+    @linkField name for name in ["title", "location"]
 
 # Manages the QuizRoundEditorViews for the rounds collection of the
 # Quiz model. Also includes a control to add new Quiz rounds.

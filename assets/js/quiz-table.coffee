@@ -1,0 +1,3 @@
+{ConfirmDialog} = Q
+
+{View} = Backbone
