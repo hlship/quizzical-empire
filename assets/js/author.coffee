@@ -57,7 +57,7 @@ QuizList = Collection.extend
 # passed to the constructor:
 # options.title -- Title for the modal header
 # options.body -- Markup for the body of the dialog
-# options.label -- Label for the primary button
+# options.label -- Label for the primary button, default: "Confirm"
 # options.buttonClass -- Additional CSS class for the
 # primary button, default: "btn-primary"
 #
@@ -66,7 +66,11 @@ QuizList = Collection.extend
 ConfirmDialog = View.extend
 
   initialize: ->
-    @$el.html fromMustacheTemplate "ConfirmDialog", @options
+    @$el.html fromMustacheTemplate "ConfirmDialog",
+      title: @options.title
+      body: @options.body
+      label: @options.label or "Confirm"
+
     @$(".x-confirm").addClass @options.buttonClass or "btn-primary"
 
     $("body").append(@$el)
@@ -211,18 +215,18 @@ QuizTableView = View.extend
 
 # QuizEditorView creates and manages a top level tab for a Quiz.
 # Creates a clone of the model which is editted. The original model is
-# updated at the end.  TODO: Split this up into one View for handling
-# the tabs and the save/cancel button, and additional views for
-# everything else.
+# updated at the end.
 QuizEditorView = FormView.extend
 
   className: "tab-pane"
 
-  # Create the top level tab and select it
   initialize: ->
 
+    # Keep the original model, to flush changes into at the end, but do
+    # everything else in a clone.
     @originalModel = @model
     @model = @model.clone()
+    @dirty = false
 
     tabId = _.uniqueId "quiztab_"
 
@@ -245,10 +249,10 @@ QuizEditorView = FormView.extend
 
     @updateSaveButton()
 
-    # More boilerplate.  Kind of wish there was a special
-    # Backbone event for unvalidated changes.
     @model.on "change:title", @updateTabTitle, this
     @model.on "change", @updateSaveButton, this
+    @model.on "change", @triggerDirtyEvent, this
+    @model.on "dirty", @markDirty, this
 
     # Move the cursor into the title field
     @$(".x-title input").select()
@@ -263,12 +267,12 @@ QuizEditorView = FormView.extend
       model: @model
       el: @$(".x-rounds")
 
+  triggerDirtyEvent: -> @model.trigger "dirty"
+
+  markDirty: -> @dirty = true
+
   remove: ->
     displayFirstTab()
-
-    # Sometimes the tooltip stays after the rest of the UI is discarded,
-    # so make sure it is hidden.
-    @$(".x-cancel").tooltip "hide"
 
     @$el.remove()
 
@@ -283,8 +287,6 @@ QuizEditorView = FormView.extend
 
   # Disables the save button unless model is valid
   updateSaveButton: ->
-    # TODO: May need to make this smarter, event based,
-    # to deal with nested models that may also be invalid.
     @$(".x-save").attr "disabled", not @model.enableSave()
 
   # Handles the case, for new models, that the title may be blank.
@@ -292,9 +294,15 @@ QuizEditorView = FormView.extend
     @model.escape("title") || "<em>New Quiz</em>"
 
   doCancel: ->
-    # TODO: A modal warning
+   @$(".x-cancel").tooltip "hide"
 
-    @remove()
+   if @dirty
+      dialog = new ConfirmDialog
+        title: "Discard changes?"
+        body: "<p>Changes will be lost. This can not be undone.</p>"
+      dialog.on "confirm", @remove, this
+    else
+      @remove()
 
   # Used to display server-side errors when saving/updating the model.
   errorAlert: (message) ->
@@ -349,6 +357,8 @@ QuizRoundsEditorView = View.extend
     @collection.each (round, i) ->
       round.set "index", i + 1
       @createRoundView round
+
+    @collection.on "all", => @model.trigger "dirty"
 
   createRoundView: (round) ->
     ctor = roundTypeToView[round.get("type")]
