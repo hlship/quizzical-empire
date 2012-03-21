@@ -21,19 +21,25 @@ Quiz = Model.extend
     rounds: [] # of Round
   enableSave: ->
     (not isBlank @get "title") and
-    _(@get "round").all (round) -> round.enableSave()
+    _(@get "rounds").all (round) -> round.enableSave()
 
 # What does Backbone do with nested entities without
 # their own id?
 Round = Model.extend
   default: ->
     questions: [] # of Question
-  enableSave: -> true
+  enableSave: ->
+    return false if isBlank @get "title"
+
+    questions = @get "questions"
+
+    _.all questions, (q) -> q.enableSave()
 
 RoundCollection = Collection.extend
   model: Round
 
-Question = Model.extend()
+Question = Model.extend
+  enableSave: -> true
 
 QuizList = Collection.extend
   model: Quiz

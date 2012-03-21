@@ -167,7 +167,7 @@ QuizEditorView = FormView.extend
     @updateSaveButton()
 
     @model.on "change:title", @updateTabTitle, this
-    @model.on "change", @updateSaveButton, this
+    @model.on "change childChange", @updateSaveButton, this
     @model.on "change", @triggerDirtyEvent, this
     @model.on "dirty", @markDirty, this
 
@@ -186,7 +186,9 @@ QuizEditorView = FormView.extend
 
   triggerDirtyEvent: -> @model.trigger "dirty"
 
-  markDirty: -> @dirty = true
+  markDirty: ->
+    @dirty = true
+    @$(".x-cancel").addClass "btn-warning"
 
   remove: ->
     displayFirstTab()
@@ -273,7 +275,9 @@ QuizRoundsEditorView = View.extend
       round.set "index", i + 1
       @createRoundView round
 
-    @collection.on "all", => @model.trigger "dirty"
+    @collection.on "all", =>
+      @model.set "rounds", @collection.toArray()
+      @model.trigger "childChange"
 
     @collection.on "add remove", @renumberRounds, this
 
