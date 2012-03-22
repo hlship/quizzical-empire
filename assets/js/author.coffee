@@ -267,11 +267,11 @@ QuizRoundsEditorView = View.extend
   initialize: ->
     @$el.html readTemplate "QuizRoundsEditorView"
 
+    @accordion = @$(".accordion")
+
     @collection = new RoundCollection @model.get "rounds"
 
-    @container = @$(".x-round-container")
-
-    @collection.each (round, i) ->
+    headers = @collection.map (round, i) ->
       round.set "index", i + 1
       @createRoundView round
 
@@ -283,7 +283,16 @@ QuizRoundsEditorView = View.extend
 
   createRoundView: (round) ->
     ctor = roundTypeToView[round.get("type")]
-    new ctor { model:round, @collection, @container }
+    view = new ctor model:round
+
+    header = new RoundHeaderView {
+      @collection, @accordion,
+      model: round,
+      editor: view.$el }
+
+    @accordion.append header.$el
+
+    return header
 
   addNewRound: (event) ->
     event.preventDefault()
@@ -292,7 +301,9 @@ QuizRoundsEditorView = View.extend
       type: type
       index: @collection.length + 1
     @collection.add round
-    @createRoundView round
+
+    @$(".x-round[data-toggle='collapse']").collapse "hide"
+    (@createRoundView round).show()
 
   renumberRounds: ->
     index = 1
@@ -307,12 +318,31 @@ RoundHeaderView = FormView.extend
     @$el.html fromMustacheTemplate "RoundHeaderView",
       type: @model.get("type")
 
+    # Since we're not using "data-" attributes, we have to wire
+    # up a click event handler ourselves, rather than rely on the
+    # global listener buliding into bootstrap-collapse.js
+    @body = @$(".x-round.accordion-body").collapse
+      toggle: false
+      parent: @options.accordion
+
+    toggle = @$(".x-round[data-toggle='collapse']").tooltip()
+    toggle.on "click", (event) =>
+      event.preventDefault()
+      @body.collapse "toggle"
+
     @linkElement "index"
     # Can't use defaults since there's two .x-title elements
     @linkElement "title", ".x-round-header .x-title", "No Title"
     @linkField "title", ".control-group.x-title"
 
     @$(".x-editor").html @options.editor
+
+  hide: ->
+    @body.collapse "hide"
+
+  show: ->
+    @body.collapse "show"
+
 
   events:
     "click .x-round-header .x-delete": "doDelete"
@@ -332,14 +362,9 @@ RoundHeaderView = FormView.extend
 
 NormalRoundEditView = FormView.extend
   initialize: ->
-    @$el.html fromMustacheTemplate "NormalRoundEditView",
-      index: @model.get "index"
+    @$el.html readTemplate "NormalRoundEditView"
 
-    header = new RoundHeaderView { @model, @collection, editor: @$el}
-
-    @options.container.append header.$el
-
-roundTypeToView =
+ roundTypeToView =
   normal: NormalRoundEditView
   challenge: undefined
   wager: undefined
