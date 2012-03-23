@@ -3,6 +3,10 @@ mongoose = require "mongoose"
 
 app = module.exports = express.createServer()
 
+app.configure "development", ->
+  app.use express.logger "dev"
+  app.use express.errorHandler  dumpExceptions: true, showStack:true
+
 app.configure ->
   app.set "views", "#{__dirname}/views"
   app.set "view engine", "jade"
@@ -13,9 +17,6 @@ app.configure ->
   app.use require("connect-assets")()
   app.use express.static "#{__dirname}/public"
   express.errorHandler.title = "Quizzical Empire Online"
-
-app.configure "development", ->
-  app.use express.errorHandler  dumpExceptions: true, showStack:true
 
 app.configure "production", ->
   app.use express.errorHandler()
