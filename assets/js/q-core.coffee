@@ -14,21 +14,21 @@ isBlank = (str) ->
   str.trim() is ""
 
 # Models and Collections
+# Backbone expressly doesn't deal with relationships, that's left as
+# an exercise. We implement the parse method on each Model
+# to convert raw JSON to Model objects.
 
-Quiz = Model.extend
-  idAttribute: "_id"
-  urlRoot: "/api/quiz"
-  default: ->
-    rounds: [] # of Round
-  enableSave: ->
-    (not isBlank @get "title") and
-    _(@get "rounds").all (round) -> round.enableSave()
+Question = Model.extend
+  enableSave: -> true
 
-# What does Backbone do with nested entities without
-# their own id?
 Round = Model.extend
   default: ->
     questions: [] # of Question
+  parse: (response) ->
+    response.questions = _(response.questions).map (raw) ->
+      new Question raw, { parse: true }
+    return response
+
   enableSave: ->
     return false if isBlank @get "title"
 
@@ -39,8 +39,19 @@ Round = Model.extend
 RoundCollection = Collection.extend
   model: Round
 
-Question = Model.extend
-  enableSave: -> true
+Quiz = Model.extend
+  idAttribute: "_id"
+  urlRoot: "/api/quiz"
+  parse: (response) ->
+    response.rounds = _(response.rounds).map (raw) ->
+      new Round raw, { parse: true }
+    return response
+
+  default: ->
+    rounds: [] # of Round
+  enableSave: ->
+    (not isBlank @get "title") and
+    _(@get "rounds").all (round) -> round.enableSave()
 
 QuizList = Collection.extend
   model: Quiz
