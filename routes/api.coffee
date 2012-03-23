@@ -17,18 +17,23 @@ handleError = (res, fn) ->
     else
       fn(arg)
 
+extractError = (err) ->
+  _(_.values(err?.errors)).chain()
+    .pluck("message").first()
+    .value() or err?.message
+
 saveAndReturnQuiz = (res, quiz) ->
-  quiz.save (err, doc) ->
+  quiz.save (err) ->
     if err
-      switch err.code
+      switch err?.code
         when 11000
           sendError res, "Quiz title must be unique"
         else
-          sendError res, err.err
+          sendError res, extractError err
 
       return
 
-    res.send doc
+    res.send quiz
 
 getAndReturnQuiz = (req, res) ->
   quiz = Quiz.findById req.params.id,
@@ -67,7 +72,6 @@ module.exports = (app) ->
 
   app.delete "/api/quizzes/:id",
     (req, res) ->
-      console.log "Deleting quiz #{req.params.id}"
       # very dangerous! Need to add some permissions checking
       Quiz.remove { _id: req.params.id },
         handleError res, () -> res.send result: "ok"
