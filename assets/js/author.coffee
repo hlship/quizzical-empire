@@ -271,9 +271,13 @@ QuizRoundsEditorView = View.extend
 
     @collection = new RoundCollection @model.get "rounds"
 
-    headers = @collection.map (round, i) ->
+    lastView = null
+
+    headers = @collection.map (round, i) =>
       round.set "index", i + 1
-      @createRoundView round
+      lastView = @createRoundView round
+
+    lastView? and lastView.show()
 
     @collection.on "all", =>
       @model.set "rounds", @collection.toArray()
@@ -282,7 +286,7 @@ QuizRoundsEditorView = View.extend
     @collection.on "add remove", @renumberRounds, this
 
   createRoundView: (round) ->
-    ctor = roundTypeToView[round.get("type")]
+    ctor = roundKindToViewClass[round.get("kind")]
     view = new ctor model:round
 
     header = new RoundHeaderView {
@@ -296,13 +300,12 @@ QuizRoundsEditorView = View.extend
 
   addNewRound: (event) ->
     event.preventDefault()
-    type = @$(".x-add-new-round select").val()
+    kind = @$(".x-add-new-round select").val()
     round = new Round
-      type: type
+      kind: kind
       index: @collection.length + 1
     @collection.add round
 
-    @$(".x-round[data-toggle='collapse']").collapse "hide"
     (@createRoundView round).show()
 
   renumberRounds: ->
@@ -316,23 +319,23 @@ QuizRoundsEditorView = View.extend
 RoundHeaderView = FormView.extend
   initialize: ->
     @$el.html fromMustacheTemplate "RoundHeaderView",
-      type: @model.get("type")
+      kind: @model.get "kind"
 
     # Since we're not using "data-" attributes, we have to wire
     # up a click event handler ourselves, rather than rely on the
-    # global listener buliding into bootstrap-collapse.js
-    @body = @$(".x-round.accordion-body").collapse
+    # global listener built into bootstrap-collapse.js
+    @body = @$(".accordion-body").collapse
       toggle: false
       parent: @options.accordion
 
-    toggle = @$(".x-round[data-toggle='collapse']").tooltip()
+    toggle = @$(".accordian-toggle").tooltip()
     toggle.on "click", (event) =>
       event.preventDefault()
       @body.collapse "toggle"
 
     @linkElement "index"
     # Can't use defaults since there's two .x-title elements
-    @linkElement "title", ".x-round-header .x-title", "No Title"
+    @linkElement "title", "span.x-title", "No Title"
     @linkField "title", ".control-group.x-title"
 
     @$(".x-editor").html @options.editor
@@ -345,7 +348,7 @@ RoundHeaderView = FormView.extend
 
 
   events:
-    "click .x-round-header .x-delete": "doDelete"
+    "click .accordion-heading .x-delete": "doDelete"
 
   doDelete: (event) ->
     event.preventDefault()
@@ -364,7 +367,7 @@ NormalRoundEditView = FormView.extend
   initialize: ->
     @$el.html readTemplate "NormalRoundEditView"
 
- roundTypeToView =
+ roundKindToViewClass =
   normal: NormalRoundEditView
   challenge: undefined
   wager: undefined

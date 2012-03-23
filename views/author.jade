@@ -86,26 +86,39 @@ block append templates
 
   script#RoundHeaderView(type="text/template")
     .accordion-group
-      .accordion-heading.x-round-header
-        a.accordian-toggle.x-round(
+      .accordion-heading
+        a.accordian-toggle(
           rel="tooltip"
           data-placement="top"
           title="Expand/Collapse this round")
           | Round #
           span.x-index 999
-          |  ({{type}})
+          |  ({{kind}})
           em: span.x-title Round Title
         button.btn.btn-danger.btn-mini.x-delete.pull-right Delete
-      .accordion-body.x-round.collapse
+      .accordion-body.collapse
         .control-group.x-title.accordion-inner
-          label Round Title
+          label
+            | Round
+            span.x-index 999
+            |  Title
           input.span4(type="text", required, rows=10, cols=100)
           span.help-inline Title or theme for this round
         .x-editor
 
   script#NormalRoundEditView(type="text/template")
-    .control-group.x-placeholder
-      textarea(rows=10, cols=100)
+    table.table.table-bordered.table-striped.table-condensed
+      thead
+        th Question
+        th Answer
+        th Points
+        th
+      tbody
+    .pull-right
+      button.btn.btn-mini.x-add
+        i.icon-plus
+        | Add
+
 
    script#standard-error-alert(type="text/template")
      div.alert.alert-error.fade.in
