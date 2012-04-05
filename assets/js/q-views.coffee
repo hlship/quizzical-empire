@@ -45,31 +45,9 @@ FormView = View.extend
 # is triggered if the user dismisses the dialog or clicks the close button.
 ConfirmDialog = View.extend
 
-  initialize: ->
-    @$el.html fromMustacheTemplate "ConfirmDialog",
-      title: @options.title
-      body: @options.body
-      label: @options.label or "Confirm"
-
-    @$(".x-confirm").addClass @options.buttonClass or "btn-primary"
-
-    $("body").append(@$el)
-
-    @$el.addClass "fade in"
-
-    # After the modal dialog is hidden, remove it from the DOM
-    @$el.modal().on "hidden", =>
-      @remove()
-
-   dismissDialog: ->
-    @$el.modal "hide"
-
-   doConfirm: ->
-     @trigger "confirm"
-
-   events:
-    "click .x-confirm": "doConfirm"
-    "click .btn": "dismissDialog"
+  show: ->
+    if window.confirm @options.title
+      @trigger "confirm"
 
 _.extend Quizzical, {fromMustacheTemplate, readTemplate,
   ConfirmDialog, FormView }

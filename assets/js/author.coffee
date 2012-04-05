@@ -36,12 +36,13 @@ QuizTableRowView = View.extend
 
     dialog = new ConfirmDialog
       title: "Really delete Quiz?"
-      body: "<p>Deletion of quiz <strong>#{title}</strong>
-is immediate and can not be undone.</p>"
+      body: "Deletion of quiz '#{title}' is immediate and can not be undone."
       label: "Delete Quiz"
       buttonClass: "btn-danger"
 
     dialog.on "confirm", => @model.destroy()
+
+    dialog.show()
 
   editQuiz: ->
 
@@ -78,11 +79,6 @@ QuizTableView = View.extend
     @quizzes.on "destroy", @render, this
 
     @quizzes.fetch()
-
-    @$(".x-create-test-data").popover
-      title: "For Testing"
-      content: "Creates many Quizzes with random text, for testing purposes.
-                This will be removed in the final application."
 
   addOne: (quiz, collection, options) ->
     view = new QuizTableRowView
@@ -218,8 +214,9 @@ QuizEditorView = FormView.extend
    if @dirty
       dialog = new ConfirmDialog
         title: "Discard changes?"
-        body: "<p>Changes will be lost. This can not be undone.</p>"
+        body: "Changes will be lost. This can not be undone."
       dialog.on "confirm", @remove, this
+      dialog.show()
     else
       @remove()
 
@@ -355,13 +352,15 @@ RoundHeaderView = FormView.extend
 
     dialog = new ConfirmDialog
       title: "Really delete?"
-      body: "<p>The entire round will be deleted, along with all questions.</p>"
+      body: "The entire round will be deleted, along with all questions."
       label: "Delete Round"
       buttonClass: "btn-danger"
 
     dialog.on "confirm", =>
       @remove()
       @collection.remove @model
+
+    dialog.show()
 
 NormalRoundEditView = FormView.extend
   initialize: ->

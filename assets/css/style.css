@@ -1,8 +1,10 @@
-body {
+xbody {
  padding: 45px;
 }
 
-.limit-height {
+.hide { display: none; }
+
+x.limit-height {
   /* Found by trial and error, but fits the main Quizzes table on my iPad in landscape orientation. */
   max-height: 425px;
   overflow-y: scroll;

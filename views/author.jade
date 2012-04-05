@@ -7,7 +7,7 @@ block content
   //- Insertion point for table or alert:
 
   .tabbable#top-level-tabs
-    ul.nav.nav-tabs
+    ul.nav.nav-tabs.hide
       li: a(href="#quiz-table-view", data-toggle="tab") Quizzes
     .tab-content
       #quiz-table-view.tab-pane
@@ -18,7 +18,7 @@ block append templates
       strong.
         No Quizzes have been created yet ... feel free to start creating some!
     .limit-height
-      table.table.table-bordered.table-striped.table-condensed
+      table.table.table-bordered.table-striped.table-condensed(border=1)
         thead
           tr
             th Title
@@ -37,17 +37,8 @@ block append templates
     td {{location}}
     td {{created}}
     td.dropdown
-      a.btn.dropdown-toggle(data-toggle="dropdown")
-        | Actions
-        b.caret
-      ul.dropdown-menu
-        li: a.x-edit
-          i.icon-pencil
-          | Edit
-        li.divider
-        li: a.x-delete
-          i.icon-remove
-          | Delete
+      button.x-edit Edit
+      button.x-delete Delete
 
   script#QuizEditorView(type="text/template")
     .x-alert-container

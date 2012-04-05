@@ -4,17 +4,15 @@ html
       //- Often use block append head to add more JS/CSS to the page
       block head
         title= title
-        != css("/bootstrap/css/bootstrap")
         != css("style")
   body
     .navbar.navbar-fixed-top
       .navbar-inner
         .container
-          a.brand(href="#")
-            img(src="/images/logo-navbar.png")
-            | Quizzical Empire
+            h1 Quizzical Empire
     .container-fluid
        block content
+       hr
        div &copy; 2012 &nbsp;
          a(href="http://howardlewisship.com/") Howard M. Lewis Ship
     //- Divs containing templates go here, at the bottom
