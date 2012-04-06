@@ -152,8 +152,6 @@ QuizEditorView = FormView.extend
       .html(readTemplate "QuizEditorView")
       .appendTo("#top-level-tabs > .tab-content")
 
-    @$(".x-cancel").tooltip()
-
     @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
 
     @viewTab.tab "show"
