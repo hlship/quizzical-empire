@@ -10,3 +10,7 @@ module.exports = (app) ->
 
 
   require("./api")(app)
+
+  app.get "/ex:id",
+    (req, res) ->
+      res.render "ex#{req.params.id}"
