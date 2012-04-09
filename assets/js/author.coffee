@@ -37,7 +37,7 @@ QuizTableRowView = View.extend
     dialog = new ConfirmDialog
       title: "Really delete Quiz?"
       body: "<p>Deletion of quiz <strong>#{title}</strong>
-is immediate and can not be undone.</p>"
+ is immediate and can not be undone.</p>"
       label: "Delete Quiz"
       buttonClass: "btn-danger"
 
