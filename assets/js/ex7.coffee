@@ -3,7 +3,7 @@ jQuery ($) ->
   tabContent = $(".tab-content")
 
   _.each ["Moe Howard", "Larry Fine", "Curly Howard"],
-    (name, index) ->
+    (name) ->
       firstName = name.split(' ')[0]
       uid = _.uniqueId "tab"
 
@@ -22,7 +22,7 @@ jQuery ($) ->
       """)
 
       content.appendTo tabContent
-      tab.appendTo(tabs)
+      tab.appendTo tabs
 
   tabs.find("li:first").addClass "active"
   tabContent.find(".tab-pane:first").addClass "active in"
