@@ -15,8 +15,7 @@ FormView = View.extend
   # contain an <input> element
   # defaults to ".x-#{name}"
   linkField: (name, selector = ".x-#{name}") ->
-    $container = @$(selector)
-    $field = $container.find "input"
+    $field = @$("#{selector} input")
 
     $field.val @model.get(name)
 
@@ -45,6 +44,8 @@ FormView = View.extend
 # is triggered if the user dismisses the dialog or clicks the close button.
 ConfirmDialog = View.extend
 
+  className: "modal fade in"
+
   initialize: ->
     @$el.html fromMustacheTemplate "ConfirmDialog",
       title: @options.title
@@ -55,21 +56,16 @@ ConfirmDialog = View.extend
 
     $("body").append(@$el)
 
-    @$el.addClass "fade in"
-
     # After the modal dialog is hidden, remove it from the DOM
     @$el.modal().on "hidden", =>
       @remove()
-
-   dismissDialog: ->
-    @$el.modal "hide"
 
    doConfirm: ->
      @trigger "confirm"
 
    events:
     "click .x-confirm": "doConfirm"
-    "click .btn": "dismissDialog"
+
 
 _.extend Quizzical, {fromMustacheTemplate, readTemplate,
   ConfirmDialog, FormView }
