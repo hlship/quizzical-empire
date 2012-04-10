@@ -24,7 +24,7 @@ QuizTableRowView = View.extend
   render: ->
 
     @$el.html Mustache.render @template,
-      title: @model.escape "title" || "<em>No Title</em>"
+      title: @model.escape "title" or "<em>No Title</em>"
       location: @model.escape "location"
       created: @model.get "created"
 
@@ -86,7 +86,7 @@ QuizTableView = View.extend
 
   addOne: (quiz, collection, options) ->
     view = new QuizTableRowView
-      model:quiz
+      model: quiz
       collection: @quizzes
 
     # Special case for inserting at index 0, which happens when a new quiz
@@ -236,7 +236,7 @@ QuizEditorView = FormView.extend
     @model.save null,
       error: (model, response) =>
         b.button("reset")
-        @errorAlert response.responseText or response.statusText
+
 
       success: (model, response) =>
         b.button("reset")
