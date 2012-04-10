@@ -24,6 +24,7 @@ Question = Model.extend
 Round = Model.extend
   default: ->
     questions: [] # of Question
+
   parse: (response) ->
     response.questions = _(response.questions).map (raw) ->
       new Question raw, { parse: true }
@@ -41,7 +42,9 @@ RoundCollection = Collection.extend
 
 Quiz = Model.extend
   idAttribute: "_id"
+
   urlRoot: "/api/quiz"
+
   parse: (response) ->
     response.rounds = _(response.rounds).map (raw) ->
       new Round raw, { parse: true }
@@ -49,6 +52,7 @@ Quiz = Model.extend
 
   default: ->
     rounds: [] # of Round
+
   enableSave: ->
     (not isBlank @get "title") and
     _(@get "rounds").all (round) -> round.enableSave()
