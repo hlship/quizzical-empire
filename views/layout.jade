@@ -20,14 +20,13 @@ html
     //- Divs containing templates go here, at the bottom
     block templates
       script#ConfirmDialog(type="text/template")
-        .modal
-          .modal-header
-            a.close(data-dismiss="modal") &times;
-            h3 {{title}}
-          .modal-body {{{body}}}
-          .modal-footer
-            button.btn.btn-danger.x-confirm(data-dismiss="modal") {{label}}
-            button.btn.x-close(data-dismiss="modal") Cancel
+        .modal-header
+          a.close(data-dismiss="modal") &times;
+          h3 {{title}}
+        .modal-body {{{body}}}
+        .modal-footer
+          button.btn.btn-danger.x-confirm(data-dismiss="modal") {{label}}
+          button.btn(data-dismiss="modal") Cancel
     //- Scripts are loaded last, at the end of the page
     //- Frustrating that Bootstrap.js and RequireJS seem to be at odds with
     //- each other.
