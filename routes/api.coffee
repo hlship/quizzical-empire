@@ -13,6 +13,8 @@ sendError = (res, message) ->
 handleError = (res, fn) ->
   (err, arg) ->
     if err
+      console.warn "Request processing failure:"
+      console.dir err
       sendError res, err.err
     else
       fn(arg)
@@ -90,10 +92,11 @@ module.exports = (app) ->
           location: "Undisclosed"
 
         quiz.save flow.add (err) ->
-          if not failed
+          if err and not failed
             sendError res, err
             failed = true
 
       flow.join ->
-        res.send result: "ok" if not failed
+        if not failed
+          res.send result: "ok"
 
