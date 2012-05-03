@@ -121,9 +121,8 @@ block append templates
         | Add Question
 
 
-   script#standard-error-alert(type="text/template")
-     div.alert.alert-error.fade.in
-       a.close(data-dismiss="alert", href="#") &times;
-       h4.alert-heading Error!
-       | {{content}}
-
+  script#standard-error-alert(type="text/template")
+    div.alert.alert-error.fade.in
+      a.close(data-dismiss="alert", href="#") &times;
+      h4.alert-heading Error!
+      | {{content}}
