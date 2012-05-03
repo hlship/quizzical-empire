@@ -174,15 +174,18 @@ QuizEditorView = FormView.extend
     # Move the cursor into the title field
     @$(".x-title input").select()
 
-    new QuizFieldsEditorView
+    fieldsEditor = new QuizFieldsEditorView
       model: @model
       el: @$(".x-quiz-fields")
 
     # Create a nested view that's responsible for editting, adding,
     # and deleting Rounds
-    new QuizRoundsEditorView
+    roundsEditor = new QuizRoundsEditorView
       model: @model
       el: @$(".x-rounds")
+
+    for editor in [fieldsEditor, roundsEditor]
+      editor.on "error", _.bind(@errorAlert, this)
 
   triggerDirtyEvent: -> @model.trigger "dirty"
 
@@ -230,13 +233,13 @@ QuizEditorView = FormView.extend
 
     @$(".x-alert-container").append alert
 
+
   doSave: ->
     b = @$(".x-save").button("loading")
 
     @model.save null,
       error: (model, response) =>
         b.button("reset")
-
 
       success: (model, response) =>
         b.button("reset")
@@ -269,11 +272,12 @@ QuizRoundsEditorView = View.extend
 
     @accordion = @$(".accordion")
 
-    @collection = new RoundCollection @model.get "rounds"
+    @collection = @model.get "rounds"
 
     lastView = null
 
     headers = @collection.map (round, i) =>
+      # Maybe index should be a property and not an attribute?
       round.set "index", i + 1
       lastView = @createRoundView round
 
@@ -301,6 +305,11 @@ QuizRoundsEditorView = View.extend
   addRound: (event) ->
     event.preventDefault()
     kind = $(event.target).data('round-type')
+    # Temporary:
+
+    if not roundKindToViewClass[kind]
+      @trigger "error", "Round type #{kind} is not yet supported."
+
     round = new Round
       kind: kind
       index: @collection.length + 1
@@ -366,6 +375,8 @@ RoundHeaderView = FormView.extend
 NormalRoundEditView = FormView.extend
   initialize: ->
     @$el.html readTemplate "NormalRoundEditView"
+
+
 
   doAddQuestion: (event) ->
     event.stopPropagation()

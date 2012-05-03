@@ -21,13 +21,19 @@ isBlank = (str) ->
 Question = Model.extend
   enableSave: -> true
 
+QuestionCollection = Collection.extend
+  model: Question
+
 Round = Model.extend
   default: ->
-    questions: [] # of Question
+    questions: new QuestionCollection
 
   parse: (response) ->
-    response.questions = _(response.questions).map (raw) ->
+    models = _(response.questions).map (raw) ->
       new Question raw, { parse: true }
+
+    response.questions = new QuestionCollection models
+
     return response
 
   enableSave: ->
@@ -46,12 +52,15 @@ Quiz = Model.extend
   urlRoot: "/api/quiz"
 
   parse: (response) ->
-    response.rounds = _(response.rounds).map (raw) ->
+    models = _(response.rounds).map (raw) ->
       new Round raw, { parse: true }
+
+    response.rounds = new RoundCollection models
+
     return response
 
   default: ->
-    rounds: [] # of Round
+    rounds: new RoundCollection
 
   enableSave: ->
     (not isBlank @get "title") and

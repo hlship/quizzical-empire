@@ -96,7 +96,7 @@ block append templates
           |  ({{kind}})
           | 
           em: span.x-title Round Title
-        button.btn.btn-danger.btn-mini.x-delete.pull-right Delete
+        button.btn.btn-danger.btn-mini.x-delete.pull-right Delete Round
       .accordion-body.collapse
         .control-group.x-title.accordion-inner
           label
@@ -120,9 +120,34 @@ block append templates
         i.icon-plus
         | Add Question
 
+  script#QuestionTableView(type="text/template")
+    td
+    td
+    td
+    td.dropdown
+      button.btn.dropdown-toggle(data-toggle="dropdown")
+        | Actions
+        b.caret
+      ul.dropdown-menu
+        li: a.x-edit
+          i.icon-pencil
+          | Edit
+        li: a.x-delete
+          i.icon-remove
+          | Delete
 
   script#standard-error-alert(type="text/template")
-    div.alert.alert-error.fade.in
+    .alert.alert-error.fade.in
       a.close(data-dismiss="alert", href="#") &times;
       h4.alert-heading Error!
       | {{content}}
+
+  script#EditQuestionModalView(type="text/template")
+    .modal.fade.in
+      .modal-header
+        a.close(data-dismiss="modal") &times;
+        h3 {{title}}
+      .modal-body
+        | Form goes here
+      .modal-footer
+        button.btn.btn-primary(data-dismiss="modal") OK
