@@ -367,11 +367,18 @@ NormalRoundEditView = FormView.extend
   initialize: ->
     @$el.html readTemplate "NormalRoundEditView"
 
- roundKindToViewClass =
+  doAddQuestion: (event) ->
+    event.stopPropagation()
+    window.alert "Not yet implemented"
+
+  events:
+   "click .x-add": "doAddQuestion"
+
+
+roundKindToViewClass =
   normal: NormalRoundEditView
   challenge: undefined
   wager: undefined
-
 
 # Now some page-load-time initialization:
 
