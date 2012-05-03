@@ -298,9 +298,9 @@ QuizRoundsEditorView = View.extend
 
     return header
 
-  addNewRound: (event) ->
+  addRound: (event) ->
     event.preventDefault()
-    kind = @$(".x-add-new-round select").val()
+    kind = $(event.target).data('round-type')
     round = new Round
       kind: kind
       index: @collection.length + 1
@@ -314,7 +314,7 @@ QuizRoundsEditorView = View.extend
       round.set "index", index++
 
   events:
-    "click .x-add": "addNewRound"
+    "click [data-round-type]": "addRound"
 
 RoundHeaderView = FormView.extend
   initialize: ->

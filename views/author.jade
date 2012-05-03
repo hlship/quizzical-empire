@@ -74,15 +74,15 @@ block append templates
 
   script#QuizRoundsEditorView(type="text/template")
     .x-round-container.accordion
-    .x-add-new-round
-      | Add a new
-      select.span2
+    .x-add-new-round.dropdown
+      button.btn.dropdown-toggle(data-toggle='dropdown')
+        | Add a new round 
+        b.caret
+      ul.dropdown-menu
         each type in [ "normal", "challenge", "wager" ]
-          option(value=type) #{type}
-      |  round:
-      button.btn.btn-mini.x-add
-        i.icon-plus
-        | Add
+          li: a(data-round-type='#{type}')
+            i.icon-plus
+            | Add #{type} round
 
   script#RoundHeaderView(type="text/template")
     .accordion-group
@@ -118,7 +118,7 @@ block append templates
     .pull-right
       button.btn.btn-mini.x-add
         i.icon-plus
-        | Add
+        | Add Question
 
 
    script#standard-error-alert(type="text/template")
