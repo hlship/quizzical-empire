@@ -25,7 +25,7 @@ QuestionCollection = Collection.extend
   model: Question
 
 Round = Model.extend
-  default: ->
+  defaults: ->
     questions: new QuestionCollection
 
   parse: (response) ->
@@ -59,7 +59,7 @@ Quiz = Model.extend
 
     return response
 
-  default: ->
+  defaults: ->
     rounds: new RoundCollection
 
   enableSave: ->
