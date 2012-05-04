@@ -284,7 +284,6 @@ QuizRoundsEditorView = View.extend
     lastView? and lastView.show()
 
     @collection.on "all", =>
-      @model.set "rounds", @collection.toArray()
       @model.trigger "childChange"
 
     @collection.on "add remove", @renumberRounds, this
@@ -318,9 +317,8 @@ QuizRoundsEditorView = View.extend
     (@createRoundView round).show()
 
   renumberRounds: ->
-    index = 1
-    @collection.each (round) ->
-      round.set "index", index++
+    @collection.each (round, i) ->
+      round.set "index", i + 1
 
   events:
     "click [data-round-type]": "addRound"
