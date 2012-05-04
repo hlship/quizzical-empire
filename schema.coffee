@@ -6,9 +6,6 @@ mongoose = require "mongoose"
 Schema = mongoose.Schema
 
 Question = new Schema
-  title:
-    type: String
-    required: true
   kind:
     type: String
     enum: [ "text" ]
