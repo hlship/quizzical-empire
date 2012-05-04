@@ -50,13 +50,20 @@ block append templates
           | Delete
 
   script#QuizEditorView(type="text/template")
-    .x-alert-container
     form.well(action="#")
-      .x-quiz-fields
-      .x-rounds
       button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
       | 
-      button.btn.btn-mini.x-cancel(
+      span.dropdown
+        button.btn.dropdown-toggle(data-toggle='dropdown')
+          | Add a new round 
+          b.caret
+        ul.dropdown-menu
+          each type in [ "normal", "challenge", "wager" ]
+            li: a(data-round-type='#{type}')
+              i.icon-plus
+              | Add #{type} round
+      | 
+      button.btn.x-cancel(
         rel="tooltip"
         data-placement="top"
         title="Discard changes, close tab") Cancel
@@ -72,55 +79,40 @@ block append templates
       input.span4(type="text")
       span.help-inline Location where Quiz will take place
 
-  script#QuizRoundsEditorView(type="text/template")
-    .x-round-container.accordion
-    .x-add-new-round.dropdown
-      button.btn.dropdown-toggle(data-toggle='dropdown')
-        | Add a new round 
-        b.caret
-      ul.dropdown-menu
-        each type in [ "normal", "challenge", "wager" ]
-          li: a(data-round-type='#{type}')
-            i.icon-plus
-            | Add #{type} round
-
   script#RoundHeaderView(type="text/template")
-    .accordion-group
-      .accordion-heading
-        a.accordian-toggle(
-          rel="tooltip"
-          data-placement="top"
-          title="Expand/Collapse this round")
-          | Round #
+    .accordion-heading
+      a.accordian-toggle(
+        rel="tooltip"
+        data-placement="top"
+        title="Expand/Collapse this round")
+        | Round #
+        span.x-index 999
+        |  ({{kind}})
+        | 
+        em: span.x-title Round Title
+      button.btn.btn-danger.btn-mini.x-delete.pull-right Delete Round
+    .accordion-body.collapse
+      .control-group.x-title.accordion-inner
+        label
+          | Round
           span.x-index 999
-          |  ({{kind}})
-          | 
-          em: span.x-title Round Title
-        button.btn.btn-danger.btn-mini.x-delete.pull-right Delete Round
-      .accordion-body.collapse
-        .control-group.x-title.accordion-inner
-          label
-            | Round
-            span.x-index 999
-            |  Title
-          input.span4(type="text", required, rows=10, cols=100)
-          span.help-inline Title or theme for this round
-        .x-editor
+          |  Title
+        input.span4(type="text", required, rows=10, cols=100)
+        span.help-inline Title or theme for this round
 
   script#NormalRoundEditView(type="text/template")
     table.table.table-bordered.table-striped.table-condensed
       thead
-        th Question
-        th Answer
-        th Points
-        th
+        th.span5 Question
+        th.span4 Answer
+        th.span1 Points
+        th.span2
+          button.btn.btn-mini.x-add.pull-right
+            i.icon-plus
+            | Add Question
       tbody
-    .pull-right
-      button.btn.btn-mini.x-add
-        i.icon-plus
-        | Add Question
 
-  script#QuestionTableView(type="text/template")
+  script#QuestionTableRowView(type="text/template")
     td
     td
     td

@@ -1,4 +1,4 @@
-# Create local aliases for values in the Quizzical namespace
+
 {Quiz, Round, RoundCollection, Question, QuizList, isBlank,
   readTemplate,fromMustacheTemplate, FormView, ConfirmDialog} = Quizzical
 
@@ -154,15 +154,8 @@ QuizEditorView = FormView.extend
     # and move it into place.
     @$el.attr("id", tabId)
       .html(readTemplate "QuizEditorView")
-      .appendTo("#top-level-tabs > .tab-content")
 
     @$(".x-cancel").tooltip()
-
-    @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
-
-    @viewTab.tab "show"
-
-    $("#top-level-tabs .nav-tabs a:last").tab "show"
 
     @updateSaveButton()
 
@@ -171,21 +164,32 @@ QuizEditorView = FormView.extend
     @model.on "change", @triggerDirtyEvent, this
     @model.on "dirty", @markDirty, this
 
-    # Move the cursor into the title field
-    @$(".x-title input").select()
-
     fieldsEditor = new QuizFieldsEditorView
       model: @model
-      el: @$(".x-quiz-fields")
 
     # Create a nested view that's responsible for editting, adding,
     # and deleting Rounds
-    roundsEditor = new QuizRoundsEditorView
+    @roundsEditor = new QuizRoundsEditorView
       model: @model
-      el: @$(".x-rounds")
 
-    for editor in [fieldsEditor, roundsEditor]
+    for editor in [fieldsEditor, @roundsEditor]
       editor.on "error", _.bind(@errorAlert, this)
+
+    @$el.prepend(fieldsEditor.$el, @roundsEditor.$el)
+       .appendTo("#top-level-tabs > .tab-content")
+
+    @viewTab = $("#top-level-tabs .nav-tabs a:[href='##{tabId}']")
+
+    @viewTab.tab "show"
+
+    $("#top-level-tabs .nav-tabs a:last").tab "show"
+
+  addRound: (event) ->
+    event.preventDefault()
+
+    kind = $(event.target).data "round-type"
+
+    @roundsEditor.addRound kind
 
   triggerDirtyEvent: -> @model.trigger "dirty"
 
@@ -231,8 +235,7 @@ QuizEditorView = FormView.extend
     alert = fromMustacheTemplate "standard-error-alert",
       content: message
 
-    @$(".x-alert-container").append alert
-
+    @$el.prepend alert
 
   doSave: ->
     b = @$(".x-save").button("loading")
@@ -255,6 +258,7 @@ QuizEditorView = FormView.extend
           @collection.add new Quiz(@originalModel), at: 0
 
   events:
+    "click [data-round-type]": "addRound"
     "click .x-cancel": "doCancel"
     "click .x-save": "doSave"
 
@@ -264,24 +268,23 @@ QuizFieldsEditorView = FormView.extend
 
     @linkField name for name in ["title", "location"]
 
+   # Move the cursor into the title field
+    @$(".x-title input").select()
+
 # Manages the QuizRoundEditorViews for the rounds collection of the
 # Quiz model. Also includes a control to add new Quiz rounds.
 QuizRoundsEditorView = View.extend
-  initialize: ->
-    @$el.html readTemplate "QuizRoundsEditorView"
 
-    @accordion = @$(".accordion")
+  className: "accordion"
+
+  initialize: ->
 
     @collection = @model.get "rounds"
 
-    lastView = null
-
-    headers = @collection.map (round, i) =>
+    @collection.each (round, i) =>
       # Maybe index should be a property and not an attribute?
       round.set "index", i + 1
-      lastView = @createRoundView round
-
-    lastView? and lastView.show()
+      @createRoundView round
 
     @collection.on "all", =>
       @model.trigger "childChange"
@@ -293,19 +296,17 @@ QuizRoundsEditorView = View.extend
     view = new ctor model:round
 
     header = new RoundHeaderView {
-      @collection, @accordion,
+      @collection,
+      accordion: @$el,
       model: round,
       editor: view.$el }
 
-    @accordion.append header.$el
+    @$el.append header.$el
 
     return header
 
-  addRound: (event) ->
-    event.preventDefault()
-    kind = $(event.target).data('round-type')
+  addRound: (kind) ->
     # Temporary:
-
     if not roundKindToViewClass[kind]
       @trigger "error", "Round type #{kind} is not yet supported."
 
@@ -320,10 +321,9 @@ QuizRoundsEditorView = View.extend
     @collection.each (round, i) ->
       round.set "index", i + 1
 
-  events:
-    "click [data-round-type]": "addRound"
-
 RoundHeaderView = FormView.extend
+  className: "accordion-group"
+
   initialize: ->
     @$el.html fromMustacheTemplate "RoundHeaderView",
       kind: @model.get "kind"
@@ -331,27 +331,27 @@ RoundHeaderView = FormView.extend
     # Since we're not using "data-" attributes, we have to wire
     # up a click event handler ourselves, rather than rely on the
     # global listener built into bootstrap-collapse.js
-    @body = @$(".accordion-body").collapse
+    @$body = @$(".accordion-body").collapse
       toggle: false
       parent: @options.accordion
 
     toggle = @$(".accordian-toggle").tooltip()
     toggle.on "click", (event) =>
       event.preventDefault()
-      @body.collapse "toggle"
+      @$body.collapse "toggle"
 
     @linkElement "index"
     # Can't use defaults since there's two .x-title elements
     @linkElement "title", "span.x-title", "No Title"
     @linkField "title", ".control-group.x-title"
 
-    @$(".x-editor").html @options.editor
+    @$body.append @options.editor
 
   hide: ->
-    @body.collapse "hide"
+    @$body.collapse "hide"
 
   show: ->
-    @body.collapse "show"
+    @$body.collapse "show"
 
 
   events:
@@ -370,11 +370,17 @@ RoundHeaderView = FormView.extend
       @remove()
       @collection.remove @model
 
+# @model for this view is a Round
 NormalRoundEditView = FormView.extend
   initialize: ->
     @$el.html readTemplate "NormalRoundEditView"
+    @collection = @model.get("questions")
 
-
+    $tbody = @$("tbody")
+    @collection.each (question) ->
+      row = new QuestionTableRowView model: question
+      row.render()
+      $tbody.append row.el
 
   doAddQuestion: (event) ->
     event.stopPropagation()
@@ -388,6 +394,25 @@ roundKindToViewClass =
   normal: NormalRoundEditView
   challenge: undefined
   wager: undefined
+
+# @model for this is a Question
+QuestionTableRowView = View.extend
+
+  tagName: "tr"
+
+  linkCell : ($cell, attributeName, defaultValue) ->
+    updater = -> $cell.html(
+      @model.escape(attributeName) or "<em>#{defaultValue}</em>")
+
+    @model.on "change:#{attributeName}", updater, this
+    updater.call(this)
+
+  render: ->
+    @$el.html readTemplate "QuestionTableRowView"
+    $cells = @$("td")
+    @linkCell $cells.eq(0), "text", "None"
+    @linkCell $cells.eq(1), "answer", "None"
+    @linkCell $cells.eq(2), "value", "Not Set"
 
 # Now some page-load-time initialization:
 
