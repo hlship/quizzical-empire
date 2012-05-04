@@ -2,7 +2,9 @@
 
 $ = window.jQuery
 
-readTemplate = (scriptId) -> $("##{scriptId}").html()
+readTemplate = (scriptId) ->
+  $("##{scriptId}").html() or
+    window.alert("No template element with id '#{scriptId}'.")
 
 fromMustacheTemplate = (scriptId, attributes) ->
   Mustache.render readTemplate(scriptId), attributes
