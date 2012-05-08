@@ -55,20 +55,19 @@ block append templates
       .btn-group
         button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
       .btn-group
-        div.dropdown
-          button.btn.dropdown-toggle(data-toggle='dropdown')
-            | Add a new round 
-            b.caret
-          ul.dropdown-menu
-            each type in [ "normal", "challenge", "wager" ]
-              li: a(data-round-type='#{type}')
-                i.icon-plus
-                | Add #{type} round
+        button.btn.dropdown-toggle(data-toggle='dropdown')
+          | Add a new round 
+          b.caret
+        ul.dropdown-menu
+          each type in [ "normal", "challenge", "wager" ]
+            li: a(data-round-type='#{type}')
+              i.icon-plus
+              | Add #{type} round
       .btn-group
         button.btn.x-cancel(
-        rel="tooltip"
-        data-placement="top"
-        title="Discard changes, close tab") Cancel
+          rel="tooltip"
+          data-placement="top"
+          title="Discard changes, close tab") Cancel
 
   script#QuizFieldsEditorView(type="text/template")
     .control-group.x-title
@@ -118,15 +117,12 @@ block append templates
     td
     td
     td
-    td.dropdown
-      button.btn.dropdown-toggle(data-toggle="dropdown")
-        | Actions
-        b.caret
-      ul.dropdown-menu
-        li: a.x-edit
+    td
+      .btn-group
+        button.btn.x-edit
           i.icon-pencil
           | Edit
-        li: a.x-delete
+        button.btn.x-delete
           i.icon-remove
           | Delete
 
