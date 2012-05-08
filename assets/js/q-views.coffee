@@ -46,7 +46,7 @@ FormView = View.extend
 # is triggered if the user dismisses the dialog or clicks the close button.
 ConfirmDialog = View.extend
 
-  className: "modal fade in"
+  className: "modal fade"
 
   initialize: ->
     @$el.html fromMustacheTemplate "ConfirmDialog",
