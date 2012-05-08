@@ -434,7 +434,7 @@ QuestionTableRowView = View.extend
     @collection.remove(@model)
     @remove()
 
-EditQuestionModalView = FormView.extend
+EditQuestionModalView = View.extend
 
   className: "modal modal-tall fade"
 
@@ -442,6 +442,26 @@ EditQuestionModalView = FormView.extend
     @$el.html(readTemplate "EditQuestionModalView")
       .appendTo($("body"))
       .modal().on "hidden", => @remove()
+
+    # Load initial values, and setup change event handlers
+    # to move data back into the model. Changes are immediate
+    # and there's no cancel.
+
+    # Inside the change event handler, this will be the DOM element
+    # so we need an alternate reference to the model.
+    model = @model
+
+    @$("textarea:eq(0)")
+     .val(@model.get("text"))
+     .change -> model.set text: $(this).val()
+
+    @$("textarea:eq(1)")
+     .val(@model.get("answer"))
+     .change -> model.set answer: $(this).val()
+
+    @$("input")
+     .val(@model.get("value"))
+     .change -> model.set  value: $(this).val()
 
 # Now some page-load-time initialization:
 
