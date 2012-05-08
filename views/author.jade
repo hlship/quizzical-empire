@@ -26,44 +26,46 @@ block append templates
             th.span3 Created
             th.span3
         tbody
-    .well
-      button.btn.btn-primary.x-create-new Create New Quiz
-      | 
-      button.btn.x-create-test-data(data-loading-text="Loading ...").
-        Create Test Quizzes
+    .well.btn-toolbar
+      .btn-group: button.btn.btn-primary.x-create-new Create New Quiz
+      .btn-group: button.btn.x-create-test-data(
+         data-loading-text="Loading ...").
+         Create Test Quizzes
 
   script#QuizTableRowView(type="text/template")
     td {{title}}
     td {{location}}
     td {{created}}
-    td.dropdown
-      a.btn.dropdown-toggle(data-toggle="dropdown")
-        | Actions
-        b.caret
-      ul.dropdown-menu
-        li: a.x-edit
-          i.icon-pencil
-          | Edit
-        li.divider
-        li: a.x-delete
-          i.icon-remove
-          | Delete
+    td
+      .btn-group.dropdown
+          a.btn.dropdown-toggle(data-toggle="dropdown")
+            | Actions
+            b.caret
+          ul.dropdown-menu
+            li: a.x-edit
+              i.icon-pencil
+              | Edit
+            li.divider
+            li: a.x-delete
+              i.icon-remove
+              | Delete
 
   script#QuizEditorView(type="text/template")
-    form.well(action="#")
-      button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
-      | 
-      span.dropdown
-        button.btn.dropdown-toggle(data-toggle='dropdown')
-          | Add a new round 
-          b.caret
-        ul.dropdown-menu
-          each type in [ "normal", "challenge", "wager" ]
-            li: a(data-round-type='#{type}')
-              i.icon-plus
-              | Add #{type} round
-      | 
-      button.btn.x-cancel(
+    .well.btn-toolbar
+      .btn-group
+        button.btn.btn-primary.x-save(data-loading-text="Saving ...") Save Quiz
+      .btn-group
+        div.dropdown
+          button.btn.dropdown-toggle(data-toggle='dropdown')
+            | Add a new round 
+            b.caret
+          ul.dropdown-menu
+            each type in [ "normal", "challenge", "wager" ]
+              li: a(data-round-type='#{type}')
+                i.icon-plus
+                | Add #{type} round
+      .btn-group
+        button.btn.x-cancel(
         rel="tooltip"
         data-placement="top"
         title="Discard changes, close tab") Cancel
