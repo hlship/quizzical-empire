@@ -1,4 +1,3 @@
-
 {Quiz, Round, RoundCollection, Question, QuizList, isBlank,
   readTemplate,fromMustacheTemplate, FormView, ConfirmDialog} = Quizzical
 
@@ -437,14 +436,12 @@ QuestionTableRowView = View.extend
 
 EditQuestionModalView = FormView.extend
 
-  className: "modal fade in"
+  className: "modal modal-tall fade"
 
   initialize: ->
-    @$el.html readTemplate "EditQuestionModalView"
-
-    $("body").append @$el
-
-    @$el.modal().on "hidden", => @remove()
+    @$el.html(readTemplate "EditQuestionModalView")
+      .appendTo($("body"))
+      .modal().on "hidden", => @remove()
 
 # Now some page-load-time initialization:
 

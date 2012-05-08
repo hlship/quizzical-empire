@@ -141,6 +141,20 @@ block append templates
       a.close(data-dismiss="modal") &times;
       h3 Edit Question
     .modal-body
-      | Form goes here
+      fieldset.control-group.row-fluid
+        label Question Text / Notes
+          textarea.input-xxlarge(rows=8)
+        p.help-block.
+          The question to be read (or displayed) to participants.
+      fieldset.control-group.row-fluid
+        label Question Answer
+          textarea.input-xxlarge(rows=8)
+        p.help-block.
+          The answer for the question.
+      .fieldset.control-group
+        label Value
+          input.input-mini(type='number', min=1, max=20)
+        p.help-block.
+          The value, in points, for the correct answer.
     .modal-footer
       button.btn.btn-primary(data-dismiss="modal") OK

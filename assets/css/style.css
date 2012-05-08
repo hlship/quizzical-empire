@@ -7,3 +7,7 @@ body {
   max-height: 425px;
   overflow-y: scroll;
 }
+
+.modal-tall .modal-body {
+    max-height: 600px;
+}
