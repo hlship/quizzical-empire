@@ -56,11 +56,10 @@ ConfirmDialog = View.extend
 
     @$(".x-confirm").addClass @options.buttonClass or "btn-primary"
 
-    $("body").append(@$el)
+    $("body").append @$el
 
     # After the modal dialog is hidden, remove it from the DOM
-    @$el.modal().on "hidden", =>
-      @remove()
+    @$el.modal().on "hidden", => @remove()
 
    doConfirm: ->
      @trigger "confirm"

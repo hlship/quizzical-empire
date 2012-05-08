@@ -137,11 +137,10 @@ block append templates
       | {{content}}
 
   script#EditQuestionModalView(type="text/template")
-    .modal.fade.in
-      .modal-header
-        a.close(data-dismiss="modal") &times;
-        h3 {{title}}
-      .modal-body
-        | Form goes here
-      .modal-footer
-        button.btn.btn-primary(data-dismiss="modal") OK
+    .modal-header
+      a.close(data-dismiss="modal") &times;
+      h3 Edit Question
+    .modal-body
+      | Form goes here
+    .modal-footer
+      button.btn.btn-primary(data-dismiss="modal") OK

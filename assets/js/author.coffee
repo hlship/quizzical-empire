@@ -184,6 +184,8 @@ QuizEditorView = FormView.extend
 
     $("#top-level-tabs .nav-tabs a:last").tab "show"
 
+    @roundsEditor.on "dirty", @triggerDirtyEvent
+
   addRound: (event) ->
     event.preventDefault()
 
@@ -290,6 +292,7 @@ QuizRoundsEditorView = View.extend
       @model.trigger "childChange"
 
     @collection.on "add remove", @renumberRounds, this
+    @collection.on "add remove change", => @trigger "dirty"
 
   createRoundView: (round) ->
     ctor = roundKindToViewClass[round.get("kind")]
@@ -302,6 +305,8 @@ QuizRoundsEditorView = View.extend
       editor: view.$el }
 
     @$el.append header.$el
+
+    view.on "dirty", => @trigger "dirty"
 
     return header
 
@@ -377,10 +382,14 @@ NormalRoundEditView = FormView.extend
     @collection = @model.get("questions")
 
     $tbody = @$("tbody")
-    @collection.each (question) ->
-      row = new QuestionTableRowView model: question
+    @collection.each (question) =>
+      row = new QuestionTableRowView
+        model: question
+        collection: @collection
       row.render()
       $tbody.append row.el
+
+    @collection.on "change add remove", => @trigger "dirty"
 
   doAddQuestion: (event) ->
     event.stopPropagation()
@@ -410,9 +419,32 @@ QuestionTableRowView = View.extend
   render: ->
     @$el.html readTemplate "QuestionTableRowView"
     $cells = @$("td")
+    # TODO: Truncate the text & answer values, possibly strip HTML from them
     @linkCell $cells.eq(0), "text", "None"
     @linkCell $cells.eq(1), "answer", "None"
     @linkCell $cells.eq(2), "value", "Not Set"
+
+  events:
+    "click .x-edit": "doEdit"
+    "click .x-delete": "doDelete"
+
+  doEdit: ->
+    new EditQuestionModalView model: @model
+
+  doDelete: ->
+    @collection.remove(@model)
+    @remove()
+
+EditQuestionModalView = FormView.extend
+
+  className: "modal fade in"
+
+  initialize: ->
+    @$el.html readTemplate "EditQuestionModalView"
+
+    $("body").append @$el
+
+    @$el.modal().on "hidden", => @remove()
 
 # Now some page-load-time initialization:
 
