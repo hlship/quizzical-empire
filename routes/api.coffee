@@ -13,8 +13,7 @@ sendError = (res, message) ->
 handleError = (res, fn) ->
   (err, arg) ->
     if err
-      console.warn "Request processing failure:"
-      console.dir err
+      console.error "Request processing failure: %j", err
       sendError res, err.err
     else
       fn(arg)
@@ -26,11 +25,12 @@ extractError = (err) ->
 
 saveAndReturnQuiz = (res, quiz) ->
   quiz.save (err) ->
-    if err
+    if err?
       switch err?.code
         when 11000
           sendError res, "Quiz title must be unique"
         else
+          console.error "Unexpected error on save(): %j", err
           sendError res, extractError err
 
       return
