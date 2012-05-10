@@ -114,15 +114,15 @@ block append templates
       tbody
 
   script#QuestionTableRowView(type="text/template")
-    td
-    td
+    td.truncate-long-text
+    td.truncate-long-text
     td
     td
       .btn-group
-        button.btn.x-edit
+        button.btn.btn-small
           i.icon-pencil
           | Edit
-        button.btn.x-delete
+        button.btn.btn-small
           i.icon-remove
           | Delete
 

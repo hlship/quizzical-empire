@@ -380,19 +380,30 @@ NormalRoundEditView = FormView.extend
     @$el.html readTemplate "NormalRoundEditView"
     @collection = @model.get("questions")
 
-    $tbody = @$("tbody")
+    @$tbody = @$("tbody")
+
     @collection.each (question) =>
-      row = new QuestionTableRowView
-        model: question
-        collection: @collection
-      row.render()
-      $tbody.append row.el
+      @addQuestionRow question
 
     @collection.on "change add remove", => @trigger "dirty"
+    @collection.on "add", (question) => @addQuestionRow question
+
+  addQuestionRow: (question) ->
+    row = new QuestionTableRowView
+      model: question
+      collection: @collection
+
+    row.render()
+
+    @$tbody.append row.el
 
   doAddQuestion: (event) ->
     event.stopPropagation()
-    window.alert "Not yet implemented"
+    question = new Question kind: "text"
+
+    @collection.add question
+
+    new EditQuestionModalView model: question
 
   events:
    "click .x-add": "doAddQuestion"
@@ -423,9 +434,10 @@ QuestionTableRowView = View.extend
     @linkCell $cells.eq(1), "answer", "None"
     @linkCell $cells.eq(2), "value", "Not Set"
 
-  events:
-    "click .x-edit": "doEdit"
-    "click .x-delete": "doDelete"
+    # Looks like :eq does not work as a selector in the events: property
+    # so we just bind things here
+    @$("button:eq(0)").click => @doEdit()
+    @$("button:eq(1)").click => @doDelete()
 
   doEdit: ->
     new EditQuestionModalView model: @model

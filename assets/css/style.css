@@ -8,6 +8,10 @@ body {
   overflow-y: scroll;
 }
 
+.truncate-long-text {
+  text-overflow: ellipsis;
+}
+
 .modal-tall .modal-body {
     max-height: 600px;
 }
