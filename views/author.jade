@@ -17,15 +17,14 @@ block append templates
     .alert
       strong.
         No Quizzes have been created yet ... feel free to start creating some!
-    .limit-height
-      table.table.table-bordered.table-striped.table-condensed
-        thead
-          tr
-            th Title
-            th.span3 Location
-            th.span3 Created
-            th.span3
-        tbody
+    table.table.table-bordered.table-striped.table-condensed
+      thead
+        tr
+          th Title
+          th.span3 Location
+          th.span3 Created
+          th.span3
+      tbody
     .well.btn-toolbar
       .btn-group: button.btn.btn-primary.x-create-new Create New Quiz
       .btn-group: button.btn.x-create-test-data(
@@ -44,11 +43,11 @@ block append templates
           ul.dropdown-menu
             li: a.x-edit
               i.icon-pencil
-              | Edit
+              |  Edit
             li.divider
             li: a.x-delete
               i.icon-remove
-              | Delete
+              |  Delete
 
   script#QuizEditorView(type="text/template")
     .well.btn-toolbar
@@ -62,7 +61,7 @@ block append templates
           each type in [ "normal", "challenge", "wager" ]
             li: a(data-round-type='#{type}')
               i.icon-plus
-              | Add #{type} round
+              |  Add #{type} round
       .btn-group
         button.btn.x-cancel(
           rel="tooltip"
@@ -114,8 +113,8 @@ block append templates
       tbody
 
   script#QuestionTableRowView(type="text/template")
-    td.truncate-long-text
-    td.truncate-long-text
+    td
+    td
     td
     td
       .btn-group
